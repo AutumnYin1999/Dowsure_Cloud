@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  /* 全局字号上调一档:16px -> 17px (桌面),让中文阅读更舒展 */
+  html {
+    font-size: 17px;
+  }
+  @media (max-width: 640px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  body {
+    @apply bg-surface-alt text-ink antialiased;
+    font-feature-settings: "ss01", "cv11", "palt";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  /* 中文大字标题:略增字宽,让 Heavy 字重看起来不挤 */
+  .font-display {
+    font-family: theme("fontFamily.display");
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    @apply bg-brand-100 text-brand-800;
+  }
+}
+
+@layer components {
+  .ds-card {
+    @apply rounded-2xl border border-surface-line bg-white shadow-card;
+  }
+  .ds-card-soft {
+    @apply rounded-3xl border border-white/60 bg-kpi-soft shadow-soft;
+  }
+  .ds-chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-surface-line bg-white px-2.5 py-1 text-xs text-ink-muted;
+  }
+  .ds-section-title {
+    @apply text-lg font-semibold tracking-tight text-ink sm:text-xl;
+  }
+  .ds-eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-600;
+  }
+  .ds-eyebrow-dot::before {
+    content: "";
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-brand-500;
+  }
+  .ds-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+  .ds-tab {
+    @apply ds-focus inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink;
+  }
+  .ds-tab-active {
+    @apply bg-brand-gradient text-white shadow-pop;
+  }
+  .ds-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(241, 227, 232, 0.6) 0%,
+      rgba(241, 227, 232, 0.95) 50%,
+      rgba(241, 227, 232, 0.6) 100%
+    );
+    background-size: 200px 100%;
+    @apply animate-shimmer;
+  }
+  .ds-divider-dot {
+    @apply mx-1.5 h-1 w-1 rounded-full bg-brand-200;
+  }
+  /* 走马灯:左右两端柔和淡出,hover 暂停 */
+  .ds-marquee {
+    @apply relative overflow-hidden;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+  }
+  .ds-marquee-track {
+    @apply flex w-max items-center gap-3 animate-marquee;
+  }
+  .ds-marquee:hover .ds-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

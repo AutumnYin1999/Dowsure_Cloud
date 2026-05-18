@@ -1,0 +1,55 @@
+name: Build & Deploy to Aliyun ECS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 允许手动从 Actions 页面触发
+
+# 同分支并发部署互相取消,避免新 push 还没部完就被旧的 rsync 覆盖
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build dist/ and rsync to ECS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # 把 dist/ 同步到 ECS,使用 rsync over SSH,--delete 清掉服务器上多余的旧文件
+      # 注意:ECS_DEPLOY_PATH 必须是 nginx root 指向的独立目录,例如 /var/www/dowsure
+      # 务必不要写成 / 或 /var 这种,否则 --delete 会清空服务器关键目录!
+      - name: Deploy dist/ to ECS via rsync
+        uses: easingthemes/ssh-deploy@v5.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.ECS_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.ECS_HOST }}
+          REMOTE_PORT: ${{ secrets.ECS_PORT }}
+          REMOTE_USER: ${{ secrets.ECS_USER }}
+          TARGET: ${{ secrets.ECS_DEPLOY_PATH }}
+          SOURCE: "dist/"
+          ARGS: "-rltvO --delete --exclude='.git*' --exclude='.DS_Store'"
+
+      - name: Done
+        run: echo "✅ Deployed commit ${{ github.sha }} to ${{ secrets.ECS_HOST }}:${{ secrets.ECS_DEPLOY_PATH }}"
