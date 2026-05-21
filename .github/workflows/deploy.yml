@@ -42,7 +42,7 @@ jobs:
       # 务必不要写成 / 或 /var 这种,否则 --delete 会清空服务器关键目录!
       - name: Deploy dist/ to ECS via rsync
         uses: easingthemes/ssh-deploy@v5.0.3
-        with:
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.ECS_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.ECS_HOST }}
           REMOTE_PORT: ${{ secrets.ECS_PORT }}
