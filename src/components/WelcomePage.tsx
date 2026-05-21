@@ -115,7 +115,6 @@ const KPIS: KpiCard[] = [
   { label: "3 min evaluation", value: "3", unit: "min", detail: "扫码即用 · 移动端友好", icon: Zap },
   { label: "TermPay fit scan", value: "4", unit: "signals", detail: "账期 / 应收 / 分期 / 嵌入", icon: ScanSearch },
   { label: "Provider cash-in", value: "T+1", unit: "结算", detail: "资金方直接打款到服务商账户", icon: Banknote },
-  { label: "Risk route visible", value: "13", unit: "rules", detail: "规则引擎可追溯", icon: ShieldCheck },
 ];
 
 export function WelcomePage({ onStart }: WelcomePageProps) {
@@ -283,7 +282,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
         </div>
 
         {/* KPI 小卡 */}
-        <div className="relative mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="relative mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {KPIS.map((kpi) => (
             <div key={kpi.label} className="dow-kpi-card">
               <div className="flex items-center justify-between">

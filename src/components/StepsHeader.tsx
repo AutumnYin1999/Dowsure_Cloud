@@ -22,7 +22,7 @@ export function StepsHeader({ current }: StepsHeaderProps) {
   const currentIdx = STEPS.findIndex((s) => s.key === current);
 
   return (
-    <div className="dow-glass-card animate-fade-in p-2 sm:p-2.5">
+    <div className="dow-glass-card mx-auto w-full max-w-5xl animate-fade-in p-2 sm:p-2.5">
       <ol className="flex items-stretch gap-2 overflow-x-auto">
         {STEPS.map((step, idx) => {
           const done = idx < currentIdx;
