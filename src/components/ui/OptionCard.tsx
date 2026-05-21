@@ -9,10 +9,12 @@ interface OptionCardProps {
   hint?: ReactNode;
   icon?: ReactNode;
   multi?: boolean;
+  /** 深色模式：用于 Agent OS 风格问卷。 */
+  dark?: boolean;
 }
 
 /**
- * 选项卡 —— 可被点击的卡片,问卷单选 / 多选都用它。
+ * 选项卡 —— 可被点击的卡片，问卷单选 / 多选都用它。
  * 点击切换选中态由外部控制。
  */
 export function OptionCard({
@@ -22,7 +24,69 @@ export function OptionCard({
   hint,
   icon,
   multi,
+  dark,
 }: OptionCardProps) {
+  if (dark) {
+    return (
+      <button
+        type="button"
+        role={multi ? "checkbox" : "radio"}
+        aria-checked={selected}
+        onClick={onClick}
+        className={cn(
+          "dow-option-card dow-focus",
+          selected && "dow-option-card-active"
+        )}
+      >
+        <div className="flex w-full items-start justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            {icon ? (
+              <div
+                className={cn(
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                  selected
+                    ? "bg-white/15 text-white"
+                    : "bg-white/[0.04] text-[rgba(226,219,255,0.7)]"
+                )}
+              >
+                {icon}
+              </div>
+            ) : null}
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-white">{title}</span>
+              {hint ? (
+                <span className="mt-0.5 text-xs text-[rgba(226,219,255,0.6)]">
+                  {hint}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <div
+            className={cn(
+              "flex h-5 w-5 shrink-0 items-center justify-center transition-all",
+              multi ? "rounded-md border" : "rounded-full border",
+              selected
+                ? "border-transparent bg-[linear-gradient(135deg,#ff5bb0,#a757ff_55%,#5b87ff)] text-white"
+                : "border-[rgba(180,150,255,0.3)] bg-white/[0.05] text-transparent"
+            )}
+            aria-hidden
+          >
+            {multi ? (
+              <Check className="h-3.5 w-3.5" strokeWidth={3} />
+            ) : (
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full bg-white",
+                  !selected && "opacity-0"
+                )}
+              />
+            )}
+          </div>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"

@@ -90,6 +90,12 @@ export interface ProviderProfile {
   reportTier: ReportTier;
   wantsOfflineEvents: boolean;
   needsFinanceServices: boolean;
+  /** 是否给客户提供账期 / 月结。 */
+  offersCreditToCustomers?: boolean;
+  /** 是否存在应收账款压力 / 回款慢。 */
+  hasReceivablePressure?: boolean;
+  /** 是否希望支持客户延期 / 分期付款。 */
+  wantsCustomerInstallment?: boolean;
 }
 
 /** 单条推荐项 —— 一个权益 + 推荐理由 + 优先级。 */

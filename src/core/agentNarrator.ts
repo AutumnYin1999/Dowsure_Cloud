@@ -65,9 +65,14 @@ function describeStage(
     return "整体方案进入「尊享层」,适合深度联合营销与大客户突破";
   if (profile.goals.includes("brand-exposure"))
     return "整体方案聚焦在品牌曝光与流量主线";
-  if (profile.goals.includes("offer-credit"))
-    return "整体方案围绕账期金融能力做能力补齐";
-  return "整体方案从基础获客与平台展示开始,稳步建立合作基线";
+  if (
+    profile.goals.includes("offer-credit") ||
+    profile.offersCreditToCustomers ||
+    profile.hasReceivablePressure ||
+    profile.wantsCustomerInstallment
+  )
+    return "整体方案围绕 TermPay 账期金融能力做能力补齐";
+  return "整体方案从基础获客与平台展示开始，稳步建立合作基线";
 }
 
 function describeNextMove(plan: RecommendationPlan): string {

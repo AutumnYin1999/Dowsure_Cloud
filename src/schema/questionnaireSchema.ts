@@ -21,7 +21,7 @@ export const PROVIDER_TYPES: OptionDef<ProviderType>[] = [
   { value: "logistics", label: "物流服务商", hint: "跨境头程 / 尾程 / 转运" },
   { value: "overseas-warehouse", label: "海外仓", hint: "美 / 欧 / 东南亚仓" },
   { value: "erp-tool", label: "ERP / 工具服务商", hint: "SaaS、运营工具" },
-  { value: "marketing", label: "营销服务商", hint: "广告 / 红人 / 内容" },
+  { value: "marketing", label: "广告 / 营销服务商", hint: "广告投放、红人内容" },
   { value: "fintax", label: "财税 / 合规服务商", hint: "记账、税务、合规" },
   { value: "other", label: "其他服务商", hint: "请在备注中说明" },
 ];
@@ -100,6 +100,11 @@ export const QUESTIONNAIRE_STEPS: QuestionnaireStep[] = [
     id: "goals",
     title: "增长目标与客户结构",
     description: "确定你们当前最想做的事情",
+  },
+  {
+    id: "termpay",
+    title: "账期与 TermPay 适配",
+    description: "判断你是否适合接入 TermPay 账期金融能力",
   },
   {
     id: "budget",

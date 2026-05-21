@@ -4,11 +4,15 @@ import { QuestionnairePage } from "@/components/QuestionnairePage";
 import { RecommendationPage } from "@/components/RecommendationPage";
 import { FloatingCTA, SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { StepsHeader, type FlowStep } from "@/components/StepsHeader";
+import { TermPayDashboardPreview } from "@/components/TermPayDashboardPreview";
 import { ToastHost } from "@/components/ui/Toast";
 import { WelcomePage } from "@/components/WelcomePage";
 import type { ProviderProfile } from "@/types";
 
 export default function App() {
+  const dashboardPath = window.location.pathname.startsWith("/termpay-dashboard")
+    ? window.location.pathname
+    : null;
   const [step, setStep] = useState<FlowStep>("welcome");
   const [profile, setProfile] = useState<ProviderProfile | null>(null);
 
@@ -19,12 +23,21 @@ export default function App() {
     }
   };
 
+  if (dashboardPath) {
+    return (
+      <div className="dow-dark-page relative min-h-full">
+        <ToastHost />
+        <TermPayDashboardPreview path={dashboardPath} />
+      </div>
+    );
+  }
+
   return (
-    <div className="relative min-h-full bg-surface-alt">
+    <div className="dow-dark-page relative min-h-full">
       <ToastHost />
       <SiteHeader activeTab="matrix" />
 
-      <main className="container max-w-6xl pb-20 pt-4 sm:pt-6">
+      <main className="container max-w-6xl pb-24 pt-4 sm:pt-6">
         <div className="space-y-4 sm:space-y-5">
           <StepsHeader current={step} />
 

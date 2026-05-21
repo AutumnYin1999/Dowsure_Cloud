@@ -8,7 +8,7 @@
   #root {
     height: 100%;
   }
-  /* 全局字号上调一档:16px -> 17px (桌面),让中文阅读更舒展 */
+  /* 全局字号上调一档：16px -> 17px（桌面），让中文阅读更舒展 */
   html {
     font-size: 17px;
   }
@@ -18,28 +18,38 @@
     }
   }
   body {
-    @apply bg-surface-alt text-ink antialiased;
+    @apply text-white antialiased;
+    background-color: #07051b;
+    background-image:
+      radial-gradient(60% 50% at 50% 0%, rgba(167, 87, 255, 0.22), transparent 60%),
+      radial-gradient(45% 35% at 100% 10%, rgba(91, 135, 255, 0.18), transparent 60%),
+      radial-gradient(40% 35% at 0% 30%, rgba(255, 91, 176, 0.16), transparent 60%),
+      linear-gradient(180deg, #07051b 0%, #0d0926 45%, #0a0721 100%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     font-feature-settings: "ss01", "cv11", "palt";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  /* 中文大字标题:略增字宽,让 Heavy 字重看起来不挤 */
+  /* 中文大字标题：略增字宽，让 Heavy 字重看起来不挤 */
   .font-display {
     font-family: theme("fontFamily.display");
     letter-spacing: -0.01em;
   }
   ::selection {
-    @apply bg-brand-100 text-brand-800;
+    background: rgba(167, 87, 255, 0.4);
+    color: white;
   }
 }
 
 @layer components {
+  /* ========== 原浅色组件（保留给推荐页等下游使用） ========== */
   .ds-card {
-    @apply rounded-2xl border border-surface-line bg-white shadow-card;
+    @apply rounded-2xl border border-surface-line bg-white shadow-card text-ink;
   }
   .ds-card-soft {
-    @apply rounded-3xl border border-white/60 bg-kpi-soft shadow-soft;
+    @apply rounded-3xl border border-white/60 bg-kpi-soft shadow-soft text-ink;
   }
   .ds-chip {
     @apply inline-flex items-center gap-1 rounded-full border border-surface-line bg-white px-2.5 py-1 text-xs text-ink-muted;
@@ -76,7 +86,7 @@
   .ds-divider-dot {
     @apply mx-1.5 h-1 w-1 rounded-full bg-brand-200;
   }
-  /* 走马灯:左右两端柔和淡出,hover 暂停 */
+  /* 走马灯：左右两端柔和淡出，hover 暂停 */
   .ds-marquee {
     @apply relative overflow-hidden;
     -webkit-mask-image: linear-gradient(
@@ -99,6 +109,253 @@
   }
   .ds-marquee:hover .ds-marquee-track {
     animation-play-state: paused;
+  }
+
+  /* ========== 深色 Agent OS 风格（豆服云 × TermPay 主线） ========== */
+
+  /* 整页深色背景容器，可叠加在 body 上 */
+  .dow-dark-page {
+    background:
+      radial-gradient(80% 50% at 50% 0%, rgba(167, 87, 255, 0.16), transparent 60%),
+      radial-gradient(50% 35% at 100% 0%, rgba(91, 135, 255, 0.14), transparent 60%),
+      radial-gradient(45% 30% at 0% 20%, rgba(255, 91, 176, 0.12), transparent 60%);
+  }
+
+  /* 玻璃拟态卡片 */
+  .dow-glass-card {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.035) 100%
+    );
+    border: 1px solid rgba(180, 150, 255, 0.18);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04) inset,
+      0 24px 60px -20px rgba(8, 4, 28, 0.7);
+  }
+
+  /* 深色 console / dashboard 面板 */
+  .dow-console-panel {
+    background:
+      linear-gradient(180deg, rgba(20, 14, 48, 0.92) 0%, rgba(12, 8, 32, 0.92) 100%);
+    border: 1px solid rgba(180, 150, 255, 0.22);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+      0 30px 80px -28px rgba(15, 7, 50, 0.8);
+  }
+
+  /* 内嵌的 console 行 */
+  .dow-console-row {
+    @apply flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors;
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(180, 150, 255, 0.12);
+    color: rgba(226, 219, 255, 0.78);
+  }
+  .dow-console-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(180, 150, 255, 0.22);
+  }
+
+  /* 小号 mono 英文 eyebrow */
+  .dow-eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em];
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: rgba(226, 219, 255, 0.7);
+  }
+  .dow-eyebrow-dot::before {
+    content: "";
+    @apply inline-block h-1.5 w-1.5 rounded-full;
+    background: linear-gradient(135deg, #ff5bb0, #a757ff 55%, #5b87ff);
+    box-shadow: 0 0 12px rgba(167, 87, 255, 0.7);
+  }
+
+  /* 粉紫蓝渐变文字 */
+  .dow-gradient-text {
+    background: linear-gradient(120deg, #ff5bb0 0%, #a757ff 45%, #5b87ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 渐变按钮 / CTA */
+  .dow-cta-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white transition-transform;
+    background: linear-gradient(120deg, #ff5bb0 0%, #a757ff 50%, #5b87ff 100%);
+    box-shadow:
+      0 10px 30px -8px rgba(167, 87, 255, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+  .dow-cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 14px 40px -10px rgba(167, 87, 255, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+  .dow-cta-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors;
+    color: rgba(226, 219, 255, 0.9);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(180, 150, 255, 0.22);
+  }
+  .dow-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(180, 150, 255, 0.4);
+  }
+
+  /* 步骤 Tab */
+  .dow-step-tab {
+    @apply flex flex-col items-start gap-1 rounded-2xl border px-3.5 py-2.5 text-left transition-all;
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(180, 150, 255, 0.15);
+    color: rgba(226, 219, 255, 0.72);
+    min-width: 0;
+  }
+  .dow-step-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(180, 150, 255, 0.3);
+  }
+  .dow-step-tab-active {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 91, 176, 0.18) 0%,
+      rgba(167, 87, 255, 0.18) 50%,
+      rgba(91, 135, 255, 0.18) 100%
+    );
+    border-color: rgba(167, 87, 255, 0.7);
+    color: #ffffff;
+    box-shadow:
+      0 0 0 1px rgba(167, 87, 255, 0.35),
+      0 12px 32px -12px rgba(167, 87, 255, 0.5);
+  }
+  .dow-step-tab-done {
+    background: rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.3);
+    color: rgba(167, 243, 255, 0.95);
+  }
+
+  /* 深色 input / select */
+  .dow-dark-input {
+    @apply w-full rounded-xl px-3.5 py-2.5 text-sm transition-colors outline-none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(180, 150, 255, 0.18);
+    color: #ffffff;
+  }
+  .dow-dark-input::placeholder {
+    color: rgba(226, 219, 255, 0.4);
+  }
+  .dow-dark-input:hover {
+    border-color: rgba(180, 150, 255, 0.35);
+  }
+  .dow-dark-input:focus,
+  .dow-dark-input:focus-visible {
+    border-color: rgba(167, 87, 255, 0.75);
+    box-shadow: 0 0 0 3px rgba(167, 87, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* 深色 option card（单选 / 多选） */
+  .dow-option-card {
+    @apply relative flex w-full flex-col items-start gap-1 rounded-2xl border p-3.5 text-left transition-all sm:p-4;
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(180, 150, 255, 0.15);
+    color: rgba(226, 219, 255, 0.85);
+  }
+  .dow-option-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(180, 150, 255, 0.32);
+  }
+  .dow-option-card-active {
+    background: linear-gradient(
+      140deg,
+      rgba(255, 91, 176, 0.16) 0%,
+      rgba(167, 87, 255, 0.14) 50%,
+      rgba(91, 135, 255, 0.14) 100%
+    );
+    border-color: rgba(167, 87, 255, 0.7);
+    color: #ffffff;
+    box-shadow:
+      0 0 0 1px rgba(167, 87, 255, 0.35),
+      0 12px 32px -14px rgba(167, 87, 255, 0.55);
+  }
+
+  /* 深色 toggle 卡 */
+  .dow-toggle-card {
+    @apply flex w-full cursor-pointer items-start justify-between gap-4 rounded-2xl border p-4 transition-all;
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(180, 150, 255, 0.15);
+    color: rgba(226, 219, 255, 0.85);
+  }
+  .dow-toggle-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(180, 150, 255, 0.32);
+  }
+  .dow-toggle-card-active {
+    background: linear-gradient(
+      140deg,
+      rgba(34, 211, 238, 0.12) 0%,
+      rgba(167, 87, 255, 0.14) 60%,
+      rgba(91, 135, 255, 0.12) 100%
+    );
+    border-color: rgba(34, 211, 238, 0.55);
+    color: #ffffff;
+    box-shadow:
+      0 0 0 1px rgba(34, 211, 238, 0.3),
+      0 14px 36px -14px rgba(34, 211, 238, 0.4);
+  }
+
+  /* 小 KPI 卡 */
+  .dow-kpi-card {
+    @apply flex flex-col gap-1 rounded-2xl border p-4;
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(180, 150, 255, 0.18);
+    color: rgba(226, 219, 255, 0.92);
+  }
+
+  /* 顶部固定导航 */
+  .dow-nav {
+    background: rgba(7, 5, 27, 0.65);
+    border-bottom: 1px solid rgba(180, 150, 255, 0.14);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+  .dow-nav-link {
+    @apply rounded-full px-3 py-1.5 text-sm font-medium transition-colors;
+    color: rgba(226, 219, 255, 0.65);
+  }
+  .dow-nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .dow-nav-link-active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  /* 焦点环（暗色） */
+  .dow-focus {
+    @apply outline-none;
+  }
+  .dow-focus:focus-visible {
+    box-shadow:
+      0 0 0 2px rgba(7, 5, 27, 1),
+      0 0 0 4px rgba(167, 87, 255, 0.6);
+  }
+
+  /* 暗色细分割线 */
+  .dow-divider {
+    border-top: 1px solid rgba(180, 150, 255, 0.15);
+  }
+
+  /* 错误提示 — 适配深色 */
+  .dow-alert-error {
+    @apply rounded-xl px-4 py-3 text-sm;
+    background: rgba(255, 87, 130, 0.08);
+    border: 1px solid rgba(255, 87, 130, 0.32);
+    color: #ffbcd2;
   }
 }
 

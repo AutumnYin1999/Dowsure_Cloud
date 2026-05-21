@@ -41,7 +41,8 @@ const RULES: Rule[] = [
       ruleId: "R1-base",
       benefitId: "base-package",
       priority: "required",
-      reason: "所有服务商默认包含的基础包,含展示位、AI 拓客启航版与豆分期",
+      reason:
+        "所有服务商默认包含的基础包，含展示位、AI 拓客启航版与 TermPay 账期金融能力",
     },
   ],
 
@@ -77,29 +78,45 @@ const RULES: Rule[] = [
         ]
       : [],
 
-  // R4 物流 / 海外仓 + 账期金融能力 -> 嵌入式金融 + 风控
+  // R4 TermPay 嵌入与风控 —— 由账期相关画像驱动
   (p) => {
     const isInfra =
       p.providerType === "logistics" ||
       p.providerType === "overseas-warehouse" ||
-      p.providerType === "erp-tool";
-    if (!isInfra || !p.goals.includes("offer-credit")) return [];
+      p.providerType === "erp-tool" ||
+      p.providerType === "marketing";
+    const wantsTermPay =
+      p.goals.includes("offer-credit") ||
+      p.offersCreditToCustomers === true ||
+      p.hasReceivablePressure === true ||
+      p.wantsCustomerInstallment === true ||
+      p.hasEmbeddableSystem === true;
+    if (!wantsTermPay) return [];
+
     const hits: RuleHit[] = [
       {
         ruleId: "R4a-embed",
         benefitId: "value-embed-finance",
         priority: p.hasEmbeddableSystem ? "strong" : "optional",
         reason: p.hasEmbeddableSystem
-          ? "你已有可嵌入的系统/官网,可以快速接入豆分期金融入口"
-          : "你希望为客户提供账期能力,后续上线自有系统时可嵌入金融入口",
+          ? "你希望把 TermPay 嵌入自有官网 / ERP / 客户后台 / 公众号，可直接申请技术联调"
+          : "你存在账期 / 应收 / 客户分期诉求，后续可把 TermPay 入口嵌入自有系统",
       },
     ];
-    hits.push({
-      ruleId: "R4b-risk",
-      benefitId: "value-risk-model",
-      priority: "optional",
-      reason: "账期 / 坏账风控模型可有效降低你给客户提供账期带来的资金风险",
-    });
+
+    if (
+      isInfra ||
+      p.hasReceivablePressure === true ||
+      p.offersCreditToCustomers === true
+    ) {
+      hits.push({
+        ruleId: "R4b-risk",
+        benefitId: "value-risk-model",
+        priority: "optional",
+        reason:
+          "TermPay 账期风控模型可降低你给客户账期 / 月结带来的坏账与逾期风险",
+      });
+    }
     return hits;
   },
 
@@ -401,7 +418,7 @@ function deriveName(
 
   if (hasExclusive) return "平台资源与资本加速组合";
   if (hasPremium && hasBigseller) return "大卖深度转化组合";
-  if (hasFinance) return "账期金融赋能组合";
+  if (hasFinance) return "TermPay 账期金融赋能组合";
   if (hasBanner || hasBrand) return "品牌曝光跃升组合";
   if (profile.goals.includes("lead-gen")) return "基础获客启动组合";
   return "服务商成长起步组合";
@@ -413,10 +430,10 @@ function deriveTagline(profile: ProviderProfile): string {
   const first = profile.goals[0];
   const taglineMap: Record<typeof first, string> = {
     "lead-gen": "把豆服云的卖家流量与 AI 拓客打包给你",
-    "reach-top-sellers": "锁定 T0/T1 大卖,打开高价值转化窗口",
+    "reach-top-sellers": "锁定 T0 / T1 大卖，打开高价值转化窗口",
     "brand-exposure": "用平台核心展示位 + AI 品牌内容做长期曝光",
-    "offer-credit": "把账期 / 金融能力嵌进你的客户服务里",
-    "reduce-bad-debt": "用风控模型把账期业务的风险压下来",
+    "offer-credit": "把 TermPay 账期金融能力嵌进你的客户服务里",
+    "reduce-bad-debt": "用 TermPay 风控模型把账期业务的风险压下来",
     "platform-resource": "把平台政策 + 一对一商务对接接到你的团队",
     "financing-tax": "把融资、财税、合规打包成一份诊断 + 行动方案",
     "hk-services": "用香港加速器 + 跨境云资源完成出海落地",
@@ -453,8 +470,8 @@ function deriveNextSteps(
   if (items.some((i) => i.benefit.id === "value-embed-finance")) {
     steps.push({
       id: "fintech-integration",
-      title: "申请豆分期技术联调",
-      description: "对接你的 ERP / 客户后台,完成金融入口嵌入",
+      title: "申请 TermPay 技术联调",
+      description: "对接你的官网 / ERP / 客户后台 / 公众号，完成 TermPay 入口嵌入",
       icon: "plug",
     });
   }

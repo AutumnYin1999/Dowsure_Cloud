@@ -45,20 +45,31 @@ export function AnalyzingPage({ onDone }: AnalyzingPageProps) {
   }, [onDone]);
 
   return (
-    <div className="ds-card mx-auto max-w-2xl animate-fade-in p-6 sm:p-10">
+    <div className="dow-glass-card mx-auto max-w-2xl animate-fade-in p-6 sm:p-10 text-white">
       <div className="flex flex-col items-center gap-4 text-center">
         <div className="relative">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-pop">
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-2xl text-white"
+            style={{
+              background:
+                "linear-gradient(135deg, #ff5bb0 0%, #a757ff 50%, #5b87ff 100%)",
+              boxShadow: "0 14px 40px -10px rgba(167,87,255,0.6)",
+            }}
+          >
             <Loader2 className="h-7 w-7 animate-spin" />
           </div>
-          <div className="absolute inset-0 -z-10 animate-pulse rounded-2xl bg-brand-200/40 blur-2xl" />
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 animate-pulse rounded-2xl blur-2xl"
+            style={{ background: "rgba(167,87,255,0.35)" }}
+          />
         </div>
         <div className="space-y-1.5">
-          <h2 className="text-xl font-semibold tracking-tight text-ink">
+          <h2 className="text-xl font-semibold tracking-tight text-white">
             正在为你智能分析
           </h2>
-          <p className="max-w-md text-sm text-ink-muted">
-            Agent 正在根据你的问卷答案,检索权益知识库,并生成推荐组合方案
+          <p className="max-w-md text-sm text-[rgba(226,219,255,0.7)]">
+            Agent 正在根据你的问卷答案，检索权益知识库，并生成 TermPay 推荐组合方案
           </p>
         </div>
       </div>
@@ -72,33 +83,48 @@ export function AnalyzingPage({ onDone }: AnalyzingPageProps) {
               key={s.label}
               className={cn(
                 "flex items-start gap-3 rounded-xl border p-3.5 transition-all",
-                done && "border-brand-100 bg-brand-50/40",
-                active && "border-brand-300 bg-white shadow-card",
-                !done && !active && "border-surface-line bg-white opacity-60"
+                done &&
+                  "border-[rgba(34,211,238,0.4)] bg-[rgba(34,211,238,0.08)]",
+                active &&
+                  "border-[rgba(167,87,255,0.55)] bg-white/[0.06] shadow-[0_0_0_1px_rgba(167,87,255,0.35),0_18px_40px_-18px_rgba(167,87,255,0.55)]",
+                !done &&
+                  !active &&
+                  "border-white/10 bg-white/[0.025] opacity-70"
               )}
             >
               <div
                 className={cn(
                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                  done && "bg-brand-600 text-white",
-                  active && "bg-brand-50 text-brand-700",
-                  !done && !active && "bg-surface-alt text-ink-soft"
+                  done && "bg-[rgba(34,211,238,0.18)] text-[#a7f3ff]",
+                  active &&
+                    "text-white [background:linear-gradient(135deg,#ff5bb0,#a757ff_50%,#5b87ff)]",
+                  !done && !active && "bg-white/[0.04] text-[rgba(226,219,255,0.6)]"
                 )}
               >
                 <s.icon className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-ink">{s.label}</p>
+                  <p className="text-sm font-medium text-white">{s.label}</p>
                   {active ? (
-                    <span className="ds-shimmer h-4 w-12 rounded-md" />
+                    <span
+                      className="h-4 w-12 rounded-md"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.18), rgba(255,255,255,0.05))",
+                        backgroundSize: "200px 100%",
+                        animation: "shimmer 1.4s linear infinite",
+                      }}
+                    />
                   ) : done ? (
-                    <span className="text-xs font-medium text-brand-700">
+                    <span className="text-xs font-medium text-[#a7f3ff]">
                       完成
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-0.5 text-xs text-ink-soft">{s.detail}</p>
+                <p className="mt-0.5 text-xs text-[rgba(226,219,255,0.6)]">
+                  {s.detail}
+                </p>
               </div>
             </li>
           );
