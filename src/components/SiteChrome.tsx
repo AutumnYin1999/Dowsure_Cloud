@@ -1,85 +1,128 @@
-import { ArrowUpRight, Headphones, Sparkles, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Home, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TABS = [
-  { key: "matrix", label: "权益矩阵" },
-  { key: "center", label: "赋能中心" },
-  { key: "eco", label: "生态圈" },
-];
-
 interface SiteHeaderProps {
-  /** 当前激活的 tab，由顶部页面状态决定。 */
-  activeTab?: string;
-  onTabChange?: (key: string) => void;
+  /** 提供后会显示「返回首页」按钮，并让 logo 可点击。 */
+  onHome?: () => void;
+  /** 「进入控制台」按钮点击（默认进入卖家智能服务台）。 */
+  onEnterConsole?: () => void;
+  /** 顶部「面向卖家」导航点击 → 卖家智能服务台。 */
+  onSellerEntry?: () => void;
+  /** 顶部「面向服务商」导航点击 → 服务商问卷。 */
+  onProviderEntry?: () => void;
 }
 
 export function SiteHeader({
-  activeTab = "matrix",
-  onTabChange,
+  onHome,
+  onEnterConsole,
+  onSellerEntry,
+  onProviderEntry,
 }: SiteHeaderProps) {
-  return (
-    <header className="dow-nav sticky top-0 z-30">
-      <div className="container flex h-16 max-w-6xl items-center justify-between gap-3">
-        {/* logo */}
-        <div className="flex items-center gap-2.5">
-          <div
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-white"
-            style={{
-              background:
-                "linear-gradient(135deg, #ff5bb0 0%, #a757ff 55%, #5b87ff 100%)",
-              boxShadow:
-                "0 8px 24px -6px rgba(167, 87, 255, 0.55), inset 0 0 0 1px rgba(255,255,255,0.18)",
-            }}
-          >
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div className="leading-tight">
-            <p className="text-[15px] font-semibold tracking-tight text-white">
-              豆服云{" "}
-              <span className="ml-0.5 text-xs font-medium text-[rgba(226,219,255,0.55)]">
-                / Dowsure Cloud
-              </span>
-            </p>
-            <p className="text-[11px] text-[rgba(226,219,255,0.5)]">
-              Provider OS · TermPay
-            </p>
-          </div>
-        </div>
+  const [scrolled, setScrolled] = useState(false);
 
-        {/* tabs */}
-        <nav
-          className="hidden items-center gap-1 rounded-full p-1 md:flex"
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 16);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
+  const logoContent = (
+    <>
+      <div
+        className="relative h-[22px] w-[22px] shrink-0 rounded-md"
+        style={{
+          background:
+            "radial-gradient(circle at 35% 35%, #EC4899 0%, #8B5CF6 40%, #6366F1 75%, transparent 80%)",
+        }}
+      >
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-md"
           style={{
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(180,150,255,0.16)",
+            background:
+              "radial-gradient(circle at 70% 70%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 24%)",
           }}
-        >
-          {TABS.map((tab) => {
-            const active = tab.key === activeTab;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => onTabChange?.(tab.key)}
-                className={cn(
-                  "dow-nav-link",
-                  active && "dow-nav-link-active"
-                )}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        />
+      </div>
+      <div className="flex items-baseline gap-1.5 leading-tight">
+        <p className="text-[16px] font-semibold tracking-tight text-white">
+          豆服 DF
+        </p>
+        <span className="text-[11px] font-medium text-[color:var(--fg-faint)]">
+          by 豆沙包
+        </span>
+      </div>
+    </>
+  );
+
+  return (
+    <header
+      className={cn(
+        "dow-nav fixed inset-x-0 top-0 z-30",
+        scrolled && "dow-nav-scrolled"
+      )}
+    >
+      <div className="container flex h-16 max-w-6xl items-center justify-between gap-3">
+        {/* logo — onHome 提供时可点击返回 */}
+        {onHome ? (
+          <button
+            type="button"
+            onClick={onHome}
+            className="flex items-center gap-2.5 rounded-xl transition-opacity hover:opacity-80"
+            aria-label="返回首页"
+          >
+            {logoContent}
+          </button>
+        ) : (
+          <div className="flex items-center gap-2.5">{logoContent}</div>
+        )}
+
+        {/* center links */}
+        <nav className="hidden items-center gap-7 md:flex">
+          <button
+            type="button"
+            onClick={onSellerEntry}
+            className="text-sm font-normal text-[color:var(--fg-mute)] transition-colors hover:text-white"
+          >
+            面向卖家
+          </button>
+          <button
+            type="button"
+            onClick={onProviderEntry}
+            className="text-sm font-normal text-[color:var(--fg-mute)] transition-colors hover:text-white"
+          >
+            面向服务商
+          </button>
         </nav>
 
         {/* right side */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {onHome ? (
+            <button
+              type="button"
+              onClick={onHome}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--fg-mute)] transition-colors hover:text-white"
+            >
+              <Home className="h-3.5 w-3.5" />
+              返回首页
+            </button>
+          ) : (
+            <a
+              href="#"
+              className="text-sm text-[color:var(--fg-mute)] transition-colors hover:text-white"
+            >
+              登录
+            </a>
+          )}
           <button
             type="button"
-            className="dow-cta-primary !px-3.5 !py-1.5 text-xs"
+            onClick={onEnterConsole}
+            className="dow-cta-primary !px-4 !py-2 text-sm"
           >
-            <Headphones className="h-3.5 w-3.5" />
-            1v1 商务
+            进入控制台
+            <span aria-hidden>→</span>
           </button>
         </div>
       </div>

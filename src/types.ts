@@ -53,6 +53,25 @@ export type GoalTag =
 
 export type ReportTier = "20" | "80" | "120-plus";
 
+/* ===== A 计划：服务商客观经营现状（问卷采集，用于诊断与多维评分） ===== */
+
+/** 成立年限 */
+export type FoundedYears = "lt-1" | "1-3" | "3-5" | "5-10" | "gt-10";
+/** 团队 / 营收规模区间 */
+export type CompanyScale = "micro" | "small" | "medium" | "large";
+/** 平均账期 */
+export type CreditTerm = "none" | "lte-15" | "30" | "60" | "gte-90";
+/** 去年坏账 / 逾期情况 */
+export type BadDebtLevel = "none" | "few" | "many" | "unknown";
+/** 平均应收回款周期 */
+export type ReceivableCycle = "lte-15" | "16-30" | "31-60" | "gt-60" | "unknown";
+/** 资金周转紧张度 */
+export type CashTightness = "easy" | "normal" | "tight";
+/** 融资计划 */
+export type FinancingPlan = "none" | "debt" | "equity" | "exploring";
+/** 目标卖家规模层级 */
+export type SellerTier = "new" | "mid" | "billion" | "t0-t1";
+
 /** 一项独立权益的元数据。 */
 export interface BenefitItem {
   /** 稳定的业务 id, 推荐引擎和 RAG 都会引用。 */
@@ -96,6 +115,58 @@ export interface ProviderProfile {
   hasReceivablePressure?: boolean;
   /** 是否希望支持客户延期 / 分期付款。 */
   wantsCustomerInstallment?: boolean;
+
+  /* ===== A 计划新增：客观经营现状（问卷采集，供诊断 + 多维评分；
+     上面的旧字段由这些在 finalize() 中派生，recommender 无需改写） ===== */
+  /** 主营服务环节（自由标签，多选 + 其他） */
+  serviceScopes?: string[];
+  /** 成立年限 */
+  foundedYears?: FoundedYears;
+  /** 团队 / 营收规模 */
+  companyScale?: CompanyScale;
+  /** 主营平台 */
+  platforms?: string[];
+  /** 主要客户区域 */
+  customerRegions?: string[];
+
+  /* 模块 2 · 获客现状 */
+  /** 目前主要获客方式 */
+  acquisitionChannels?: string[];
+  /** 获客最大的困难 */
+  acquisitionPains?: string[];
+  /** 最想触达的目标品类 */
+  targetCategories?: string[];
+  /** 目标卖家规模层级 */
+  targetSellerTiers?: SellerTier[];
+  /** 目标地区 */
+  targetRegions?: string[];
+  /** 当前客户数（选填，自由文本） */
+  currentCustomers?: string;
+  /** 月新增客户数（选填，自由文本） */
+  monthlyNewCustomers?: string;
+
+  /* 模块 3 · 回款与坏账 */
+  /** 与客户的结算方式（可多选） */
+  settlementModes?: string[];
+  /** 平均账期 */
+  creditTerm?: CreditTerm;
+  /** 去年坏账 / 逾期 */
+  badDebt?: BadDebtLevel;
+  /** 平均应收回款周期 */
+  receivableCycle?: ReceivableCycle;
+
+  /* 模块 4 · 经营压力与期望 */
+  /** 当前最大的经营压力（多选） */
+  businessPressures?: string[];
+  /** 资金周转紧张度 */
+  cashTightness?: CashTightness;
+  /** 融资计划 */
+  financingPlan?: FinancingPlan;
+  /** ⭐ 开放题：最头疼的经营问题 */
+  openConcern?: string;
+
+  /** 各单选 / 多选题的「其他」自由输入。key 为字段名。 */
+  otherText?: Record<string, string>;
 }
 
 /** 单条推荐项 —— 一个权益 + 推荐理由 + 优先级。 */

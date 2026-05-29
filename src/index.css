@@ -2,32 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   豆服 DF — 设计令牌 (移植自原型 df.css · Nebula 暗色体系)
+   近黑底 · 四级灰阶 · 紫蓝粉渐变(稀缺) · 金融状态色
+   ============================================================ */
+:root {
+  --bg: #0e0f18;
+  --bg-2: #171925;
+  --bg-3: #1f2130;
+  --border: #282b3b;
+  --border-2: #353951;
+  --fg: #fafafa;
+  --fg-dim: #d6d6e0;
+  --fg-mute: #a6a6b5;
+  --fg-faint: #7c7c8b;
+  --indigo: #6366f1;
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --green: #34d399;
+  --amber: #f5a623;
+  --rose: #fb7185;
+  --grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  --grad-cool: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --grad-soft: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.18) 0%,
+    rgba(139, 92, 246, 0.18) 50%,
+    rgba(236, 72, 153, 0.18) 100%
+  );
+}
+
 @layer base {
   html,
   body,
   #root {
     height: 100%;
   }
-  /* 全局字号上调一档：16px -> 17px（桌面），让中文阅读更舒展 */
+  /* 基础字号：桌面 16px（间距保持 rem 不变，字号通过 fontSize 模板单独放大） */
   html {
-    font-size: 17px;
-  }
-  @media (max-width: 640px) {
-    html {
-      font-size: 16px;
-    }
+    font-size: 16px;
   }
   body {
     @apply text-white antialiased;
-    background-color: #07051b;
+    background-color: var(--bg);
+    font-size: 1.25rem;
+    line-height: 1.6;
     background-image:
-      radial-gradient(60% 50% at 50% 0%, rgba(167, 87, 255, 0.22), transparent 60%),
-      radial-gradient(45% 35% at 100% 10%, rgba(91, 135, 255, 0.18), transparent 60%),
-      radial-gradient(40% 35% at 0% 30%, rgba(255, 91, 176, 0.16), transparent 60%),
-      linear-gradient(180deg, #07051b 0%, #0d0926 45%, #0a0721 100%);
+      radial-gradient(1100px 620px at 50% -10%, rgba(99, 102, 241, 0.1), transparent 60%),
+      radial-gradient(900px 600px at 88% 4%, rgba(139, 92, 246, 0.06), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
     background-attachment: fixed;
     background-repeat: no-repeat;
-    font-feature-settings: "ss01", "cv11", "palt";
+    font-feature-settings: "cv11", "ss01", "ss03";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -38,7 +64,7 @@
     letter-spacing: -0.01em;
   }
   ::selection {
-    background: rgba(167, 87, 255, 0.4);
+    background: rgba(139, 92, 246, 0.4);
     color: white;
   }
 }
@@ -116,66 +142,63 @@
   /* 整页深色背景容器，可叠加在 body 上 */
   .dow-dark-page {
     background:
-      radial-gradient(80% 50% at 50% 0%, rgba(167, 87, 255, 0.16), transparent 60%),
-      radial-gradient(50% 35% at 100% 0%, rgba(91, 135, 255, 0.14), transparent 60%),
-      radial-gradient(45% 30% at 0% 20%, rgba(255, 91, 176, 0.12), transparent 60%);
+      radial-gradient(80% 50% at 50% 0%, rgba(99, 102, 241, 0.1), transparent 60%),
+      radial-gradient(50% 35% at 100% 0%, rgba(139, 92, 246, 0.07), transparent 60%);
   }
 
   /* 玻璃拟态卡片 */
   .dow-glass-card {
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.07) 0%,
-      rgba(255, 255, 255, 0.035) 100%
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
     );
-    border: 1px solid rgba(180, 150, 255, 0.18);
-    border-radius: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.04) inset,
-      0 24px 60px -20px rgba(8, 4, 28, 0.7);
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 24px 60px -24px rgba(0, 0, 0, 0.6);
   }
 
   /* 深色 console / dashboard 面板 */
   .dow-console-panel {
-    background:
-      linear-gradient(180deg, rgba(20, 14, 48, 0.92) 0%, rgba(12, 8, 32, 0.92) 100%);
-    border: 1px solid rgba(180, 150, 255, 0.22);
-    border-radius: 1.25rem;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-      0 30px 80px -28px rgba(15, 7, 50, 0.8);
+      0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+      0 30px 80px -32px rgba(0, 0, 0, 0.7);
   }
 
   /* 内嵌的 console 行 */
   .dow-console-row {
     @apply flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors;
-    background: rgba(255, 255, 255, 0.025);
-    border-color: rgba(180, 150, 255, 0.12);
-    color: rgba(226, 219, 255, 0.78);
+    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--border);
+    color: var(--fg-dim);
   }
   .dow-console-row:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(180, 150, 255, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-2);
   }
 
   /* 小号 mono 英文 eyebrow */
   .dow-eyebrow {
-    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em];
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    color: rgba(226, 219, 255, 0.7);
+    @apply inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.16em];
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--fg-mute);
   }
   .dow-eyebrow-dot::before {
     content: "";
     @apply inline-block h-1.5 w-1.5 rounded-full;
-    background: linear-gradient(135deg, #ff5bb0, #a757ff 55%, #5b87ff);
-    box-shadow: 0 0 12px rgba(167, 87, 255, 0.7);
+    background: var(--violet);
   }
 
-  /* 粉紫蓝渐变文字 */
+  /* 紫蓝粉渐变文字 */
   .dow-gradient-text {
-    background: linear-gradient(120deg, #ff5bb0 0%, #a757ff 45%, #5b87ff 100%);
+    background: var(--grad);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -183,156 +206,148 @@
 
   /* 渐变按钮 / CTA */
   .dow-cta-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white transition-transform;
-    background: linear-gradient(120deg, #ff5bb0 0%, #a757ff 50%, #5b87ff 100%);
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium text-white transition-all;
+    background: var(--grad);
     box-shadow:
-      0 10px 30px -8px rgba(167, 87, 255, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 1px 0 rgba(255, 255, 255, 0.18) inset,
+      0 4px 24px -8px rgba(139, 92, 246, 0.6);
   }
   .dow-cta-primary:hover {
-    transform: translateY(-1px);
     box-shadow:
-      0 14px 40px -10px rgba(167, 87, 255, 0.7),
-      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+      0 1px 0 rgba(255, 255, 255, 0.22) inset,
+      0 8px 32px -6px rgba(139, 92, 246, 0.8);
   }
   .dow-cta-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors;
-    color: rgba(226, 219, 255, 0.9);
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(180, 150, 255, 0.22);
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--border-2);
   }
   .dow-cta-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(180, 150, 255, 0.4);
+    background: rgba(255, 255, 255, 0.02);
+    border-color: #3a3a4d;
   }
 
   /* 步骤 Tab */
   .dow-step-tab {
-    @apply flex flex-col items-start gap-1 rounded-2xl border px-3.5 py-2.5 text-left transition-all;
-    background: rgba(255, 255, 255, 0.025);
-    border-color: rgba(180, 150, 255, 0.15);
-    color: rgba(226, 219, 255, 0.72);
+    @apply flex flex-col items-start gap-1 rounded-xl border px-3.5 py-2.5 text-left transition-all;
+    background: var(--bg-2);
+    border-color: var(--border);
+    color: var(--fg-mute);
     min-width: 0;
   }
   .dow-step-tab:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(180, 150, 255, 0.3);
+    background: var(--bg-3);
+    border-color: var(--border-2);
   }
   .dow-step-tab-active {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 91, 176, 0.18) 0%,
-      rgba(167, 87, 255, 0.18) 50%,
-      rgba(91, 135, 255, 0.18) 100%
-    );
-    border-color: rgba(167, 87, 255, 0.7);
+    background: var(--grad-soft);
+    border-color: var(--violet);
     color: #ffffff;
     box-shadow:
-      0 0 0 1px rgba(167, 87, 255, 0.35),
-      0 12px 32px -12px rgba(167, 87, 255, 0.5);
+      0 0 0 1px rgba(139, 92, 246, 0.3),
+      0 12px 32px -16px rgba(139, 92, 246, 0.5);
   }
   .dow-step-tab-done {
-    background: rgba(34, 211, 238, 0.08);
-    border-color: rgba(34, 211, 238, 0.3);
-    color: rgba(167, 243, 255, 0.95);
+    background: rgba(52, 211, 153, 0.08);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: rgba(52, 211, 153, 0.95);
   }
 
   /* 深色 input / select */
   .dow-dark-input {
-    @apply w-full rounded-xl px-3.5 py-2.5 text-sm transition-colors outline-none;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(180, 150, 255, 0.18);
-    color: #ffffff;
+    @apply w-full rounded-lg px-3.5 py-2.5 text-sm transition-colors outline-none;
+    background: var(--bg-3);
+    border: 1px solid var(--border-2);
+    color: var(--fg);
   }
   .dow-dark-input::placeholder {
-    color: rgba(226, 219, 255, 0.4);
+    color: var(--fg-faint);
   }
   .dow-dark-input:hover {
-    border-color: rgba(180, 150, 255, 0.35);
+    border-color: #3a3a4d;
   }
   .dow-dark-input:focus,
   .dow-dark-input:focus-visible {
-    border-color: rgba(167, 87, 255, 0.75);
-    box-shadow: 0 0 0 3px rgba(167, 87, 255, 0.18);
-    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+    background: var(--bg-3);
   }
 
   /* 深色 option card（单选 / 多选） */
   .dow-option-card {
-    @apply relative flex w-full flex-col items-start gap-1 rounded-2xl border p-3.5 text-left transition-all sm:p-4;
-    background: rgba(255, 255, 255, 0.035);
-    border-color: rgba(180, 150, 255, 0.15);
-    color: rgba(226, 219, 255, 0.85);
+    @apply relative flex w-full flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition-all sm:p-4;
+    background: var(--bg-2);
+    border-color: var(--border);
+    color: var(--fg-dim);
   }
   .dow-option-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(180, 150, 255, 0.32);
+    background: var(--bg-3);
+    border-color: var(--border-2);
   }
   .dow-option-card-active {
-    background: linear-gradient(
-      140deg,
-      rgba(255, 91, 176, 0.16) 0%,
-      rgba(167, 87, 255, 0.14) 50%,
-      rgba(91, 135, 255, 0.14) 100%
-    );
-    border-color: rgba(167, 87, 255, 0.7);
+    background: var(--grad-soft);
+    border-color: var(--violet);
     color: #ffffff;
     box-shadow:
-      0 0 0 1px rgba(167, 87, 255, 0.35),
-      0 12px 32px -14px rgba(167, 87, 255, 0.55);
+      0 0 0 1px rgba(139, 92, 246, 0.3),
+      0 12px 32px -16px rgba(139, 92, 246, 0.5);
   }
 
   /* 深色 toggle 卡 */
   .dow-toggle-card {
-    @apply flex w-full cursor-pointer items-start justify-between gap-4 rounded-2xl border p-4 transition-all;
-    background: rgba(255, 255, 255, 0.035);
-    border-color: rgba(180, 150, 255, 0.15);
-    color: rgba(226, 219, 255, 0.85);
+    @apply flex w-full cursor-pointer items-start justify-between gap-4 rounded-xl border p-4 transition-all;
+    background: var(--bg-2);
+    border-color: var(--border);
+    color: var(--fg-dim);
   }
   .dow-toggle-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(180, 150, 255, 0.32);
+    background: var(--bg-3);
+    border-color: var(--border-2);
   }
   .dow-toggle-card-active {
-    background: linear-gradient(
-      140deg,
-      rgba(34, 211, 238, 0.12) 0%,
-      rgba(167, 87, 255, 0.14) 60%,
-      rgba(91, 135, 255, 0.12) 100%
-    );
-    border-color: rgba(34, 211, 238, 0.55);
+    background: var(--grad-soft);
+    border-color: var(--violet);
     color: #ffffff;
     box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.3),
-      0 14px 36px -14px rgba(34, 211, 238, 0.4);
+      0 0 0 1px rgba(139, 92, 246, 0.3),
+      0 14px 36px -16px rgba(139, 92, 246, 0.45);
   }
 
   /* 小 KPI 卡 */
   .dow-kpi-card {
-    @apply flex flex-col gap-1 rounded-2xl border p-4;
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(180, 150, 255, 0.18);
-    color: rgba(226, 219, 255, 0.92);
+    @apply flex flex-col gap-1 rounded-xl border p-4;
+    background: var(--bg-2);
+    border-color: var(--border);
+    color: var(--fg-dim);
   }
 
-  /* 顶部固定导航 */
+  /* 顶部固定导航 — 顶部透明无边框，滚动后浮现毛玻璃 */
   .dow-nav {
-    background: rgba(7, 5, 27, 0.65);
-    border-bottom: 1px solid rgba(180, 150, 255, 0.14);
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color 220ms ease, border-color 220ms ease,
+      backdrop-filter 220ms ease;
+  }
+  .dow-nav-scrolled {
+    background: rgba(10, 10, 15, 0.72);
+    border-bottom-color: var(--border);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
   }
   .dow-nav-link {
     @apply rounded-full px-3 py-1.5 text-sm font-medium transition-colors;
-    color: rgba(226, 219, 255, 0.65);
+    color: var(--fg-mute);
   }
   .dow-nav-link:hover {
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
   }
   .dow-nav-link-active {
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   /* 焦点环（暗色） */
@@ -341,20 +356,75 @@
   }
   .dow-focus:focus-visible {
     box-shadow:
-      0 0 0 2px rgba(7, 5, 27, 1),
-      0 0 0 4px rgba(167, 87, 255, 0.6);
+      0 0 0 2px var(--bg),
+      0 0 0 4px rgba(139, 92, 246, 0.6);
   }
 
   /* 暗色细分割线 */
   .dow-divider {
-    border-top: 1px solid rgba(180, 150, 255, 0.15);
+    border-top: 1px solid var(--border);
+  }
+
+  /* 胶囊标签 (pill) — 对齐原型 .pill */
+  .dow-pill {
+    @apply inline-flex items-center gap-2.5 rounded-full border px-3.5 py-1.5 text-[13px] font-normal;
+    border-color: var(--border-2);
+    background: rgba(255, 255, 255, 0.015);
+    color: var(--fg-dim);
+    white-space: nowrap;
+  }
+  .dow-pulse {
+    @apply h-[7px] w-[7px] shrink-0 rounded-full;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+    animation: dow-pulse 2s infinite;
+  }
+  @keyframes dow-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+    }
+  }
+
+  /* 入口卡 — 对齐原型 .entry（渐变描边 hover） */
+  .dow-entry-card {
+    position: relative;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: transform 220ms ease, border-color 220ms ease;
+  }
+  .dow-entry-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: 16px;
+    background: var(--grad);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    pointer-events: none;
+  }
+  .dow-entry-card:hover {
+    transform: translateY(-3px);
+  }
+  .dow-entry-card:hover::after {
+    opacity: 0.65;
   }
 
   /* 错误提示 — 适配深色 */
   .dow-alert-error {
     @apply rounded-xl px-4 py-3 text-sm;
-    background: rgba(255, 87, 130, 0.08);
-    border: 1px solid rgba(255, 87, 130, 0.32);
+    background: rgba(251, 113, 133, 0.08);
+    border: 1px solid rgba(251, 113, 133, 0.32);
     color: #ffbcd2;
   }
 }
@@ -373,3 +443,19 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* ============================================================
+   字号模板补丁：把组件里写死的 text-[Npx] 统一上调约 2px
+   （只改字号，不动间距 → 模块尺寸不变）
+   ============================================================ */
+.text-\[10px\] { font-size: 14px !important; }
+.text-\[11px\] { font-size: 15px !important; }
+.text-\[12px\] { font-size: 16px !important; }
+.text-\[12\.5px\] { font-size: 16.5px !important; }
+.text-\[13px\] { font-size: 17px !important; }
+.text-\[13\.5px\] { font-size: 17.5px !important; }
+.text-\[14px\] { font-size: 18px !important; }
+.text-\[14\.5px\] { font-size: 18.5px !important; }
+.text-\[15px\] { font-size: 19px !important; }
+.text-\[16px\] { font-size: 20px !important; }
+.text-\[17px\] { font-size: 21px !important; }

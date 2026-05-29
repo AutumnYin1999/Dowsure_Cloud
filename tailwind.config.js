@@ -13,6 +13,20 @@ export default {
       },
     },
     extend: {
+      // 字号模板：在默认基础上整体加大约 4px（间距 spacing 不变 → 模块尺寸不动）
+      fontSize: {
+        xs: ["1rem", { lineHeight: "1.4rem" }], // 12→16
+        sm: ["1.125rem", { lineHeight: "1.65rem" }], // 14→18
+        base: ["1.25rem", { lineHeight: "1.9rem" }], // 16→20
+        lg: ["1.375rem", { lineHeight: "2rem" }], // 18→22
+        xl: ["1.5rem", { lineHeight: "2rem" }], // 20→24
+        "2xl": ["1.75rem", { lineHeight: "2.25rem" }], // 24→28
+        "3xl": ["2.125rem", { lineHeight: "2.5rem" }], // 30→34
+        "4xl": ["2.625rem", { lineHeight: "2.9rem" }], // 36→42
+        "5xl": ["3.5rem", { lineHeight: "1" }], // 48→56
+        "6xl": ["4.25rem", { lineHeight: "1" }], // 60→68
+        "7xl": ["5rem", { lineHeight: "1" }], // 72→80
+      },
       colors: {
         // 主色: 玫红 / 珊瑚红 —— 对齐 Dowsure Cloud 视觉
         brand: {
@@ -45,30 +59,24 @@ export default {
         },
       },
       fontFamily: {
-        // 默认正文 —— 西文 Plus Jakarta Sans + 中文优先系统圆润字体
+        // 正文 —— 对齐原型 df.css：Inter + Noto Sans SC
         sans: [
-          "'Plus Jakarta Sans'",
           "Inter",
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "'PingFang SC'",
-          "'HarmonyOS Sans SC'",
-          "MiSans",
           "'Noto Sans SC'",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'PingFang SC'",
           "'Hiragino Sans GB'",
           "'Microsoft YaHei'",
-          "'Helvetica Neue'",
-          "Arial",
           "sans-serif",
         ],
-        // 大标题专用 —— 中文优先思源/苹方 Heavy,塑造柔和饱满感
+        // 大标题 —— 与正文同源（原型未使用独立 display 字体）
         display: [
-          "'Plus Jakarta Sans'",
-          "'PingFang SC'",
-          "'HarmonyOS Sans SC'",
-          "MiSans",
+          "Inter",
           "'Noto Sans SC'",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'PingFang SC'",
           "'Hiragino Sans GB'",
           "'Microsoft YaHei'",
           "sans-serif",

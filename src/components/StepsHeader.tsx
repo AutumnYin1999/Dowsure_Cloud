@@ -1,13 +1,12 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type FlowStep = "welcome" | "questionnaire" | "analyzing" | "result";
+export type FlowStep = "welcome" | "questionnaire" | "analyzing" | "diagnosis" | "result";
 
 const STEPS: { key: FlowStep; label: string; eyebrow: string }[] = [
-  { key: "welcome", label: "填写资料", eyebrow: "01 · INTAKE" },
-  { key: "questionnaire", label: "智能分析", eyebrow: "02 · SIGNAL" },
-  { key: "analyzing", label: "套餐推荐", eyebrow: "03 · ENGINE" },
-  { key: "result", label: "方案确认", eyebrow: "04 · BRIEFING" },
+  { key: "questionnaire", label: "填写现状", eyebrow: "01 · INTAKE" },
+  { key: "diagnosis", label: "经营诊断", eyebrow: "02 · DIAGNOSE" },
+  { key: "result", label: "方案确认", eyebrow: "03 · BRIEFING" },
 ];
 
 interface StepsHeaderProps {
