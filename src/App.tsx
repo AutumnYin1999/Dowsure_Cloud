@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
 import { AnalyzingPage } from "@/components/AnalyzingPage";
+import { CheckoutPage } from "@/components/CheckoutPage";
 import { DiagnosisPage } from "@/components/DiagnosisPage";
 import { GatewayPage } from "@/components/GatewayPage";
 import { ProviderProfilePage } from "@/components/ProviderProfilePage";
 import { QuestionnairePage } from "@/components/QuestionnairePage";
 import { RecommendationPage } from "@/components/RecommendationPage";
+import { ServiceStatusPage } from "@/components/ServiceStatusPage";
 import { SellerHomePage } from "@/components/SellerHomePage";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { StepsHeader, type FlowStep } from "@/components/StepsHeader";
 import { TermPayDashboardPreview } from "@/components/TermPayDashboardPreview";
-import { ToastHost, showToast } from "@/components/ui/Toast";
+import { ToastHost } from "@/components/ui/Toast";
 import type { ProviderProfile } from "@/types";
 
-type AppStep = "gateway" | "seller-home" | "provider-profile" | FlowStep;
+type AppStep =
+  | "gateway"
+  | "seller-home"
+  | "provider-profile"
+  | "checkout"
+  | "service-status"
+  | FlowStep;
 
 const STEP_PATHS: Record<AppStep, string> = {
   gateway: "/",
@@ -22,6 +30,8 @@ const STEP_PATHS: Record<AppStep, string> = {
   analyzing: "/provider/analyzing",
   diagnosis: "/provider/diagnosis",
   result: "/provider/result",
+  checkout: "/provider/checkout",
+  "service-status": "/provider/service",
   welcome: "/",
 };
 
@@ -31,6 +41,8 @@ function stepFromPath(pathname: string): AppStep {
   if (pathname.startsWith("/provider/analyzing")) return "analyzing";
   if (pathname.startsWith("/provider/diagnosis")) return "diagnosis";
   if (pathname.startsWith("/provider/result")) return "result";
+  if (pathname.startsWith("/provider/checkout")) return "checkout";
+  if (pathname.startsWith("/provider/service")) return "service-status";
   if (pathname.startsWith("/provider")) return "questionnaire";
   return "gateway";
 }
@@ -43,6 +55,7 @@ export default function App() {
     stepFromPath(window.location.pathname)
   );
   const [profile, setProfile] = useState<ProviderProfile | null>(null);
+  const [orderBenefitIds, setOrderBenefitIds] = useState<string[]>([]);
 
   useEffect(() => {
     const onPopState = () => {
@@ -87,6 +100,7 @@ export default function App() {
         onEnterConsole={() => navigate("seller-home")}
         onSellerEntry={() => navigate("seller-home")}
         onProviderEntry={() => navigate("questionnaire")}
+        onServiceQuery={() => navigate("service-status")}
       />
 
       {step === "gateway" ? (
@@ -105,6 +119,20 @@ export default function App() {
           onBackToDesk={() => navigate("seller-home")}
           onHome={resetHome}
         />
+      ) : step === "checkout" && profile ? (
+        <main className="container max-w-5xl pb-24 pt-20 sm:pt-24">
+          <CheckoutPage
+            profile={profile}
+            selectedBenefitIds={orderBenefitIds}
+            onBack={() => navigate("result")}
+            onHome={resetHome}
+            onViewServiceStatus={() => navigate("service-status")}
+          />
+        </main>
+      ) : step === "service-status" ? (
+        <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
+          <ServiceStatusPage onHome={resetHome} />
+        </main>
       ) : (
         <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
           <div className="space-y-4 sm:space-y-5">
@@ -139,9 +167,10 @@ export default function App() {
                 onProfileChange={(p) => setProfile(p)}
                 onEditQuestionnaire={() => navigate("questionnaire")}
                 onRestart={resetHome}
-                onConfirmOrder={() =>
-                  showToast("已记录方案，确认下单流程即将上线")
-                }
+                onConfirmOrder={(ids) => {
+                  setOrderBenefitIds(ids);
+                  navigate("checkout");
+                }}
               />
             ) : null}
           </div>

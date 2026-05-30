@@ -64,7 +64,7 @@ const GATEWAY_ENTRIES: GatewayEntry[] = [
       "CRM 派发履约",
     ],
     cta: "进入服务商入口",
-    variant: "ghost",
+    variant: "primary",
   },
 ];
 

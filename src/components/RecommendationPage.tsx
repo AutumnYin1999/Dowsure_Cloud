@@ -37,8 +37,8 @@ interface RecommendationPageProps {
   onRestart: () => void;
   onEditQuestionnaire: () => void;
   onProfileChange: (next: ProviderProfile) => void;
-  /** 确认方案并下单（C 计划实现闭环，这里仅入口）。 */
-  onConfirmOrder: () => void;
+  /** 确认方案并下单：把当前生效的权益 id 集合传出，跳转 checkout。 */
+  onConfirmOrder: (activeBenefitIds: string[]) => void;
 }
 
 const CATEGORY_GROUP_ORDER: BenefitCategory[] = [
@@ -140,6 +140,12 @@ export function RecommendationPage({
   const restoreRecommended = () => {
     setSelectedIds(new Set(defaultSelected));
     showToast("已恢复 Agent 推荐方案");
+  };
+
+  /** 收集当前「生效」的权益 id（选中付费项 + 必选 + 随单赠送 + 已解锁），交给 checkout。 */
+  const confirmOrder = () => {
+    const ids = KNOWLEDGE_BASE.filter((b) => isBenefitActive(b)).map((b) => b.id);
+    onConfirmOrder(ids);
   };
 
   // 计数
@@ -266,7 +272,7 @@ export function RecommendationPage({
               nextTier={nextTier}
               gapToNext={gapToNext}
               progressPct={progressPct}
-              onConfirmOrder={onConfirmOrder}
+              onConfirmOrder={confirmOrder}
             />
           </div>
         </div>
@@ -374,7 +380,7 @@ export function RecommendationPage({
               <Copy className="h-4 w-4" />
               复制摘要
             </Button>
-            <Button variant="gradient" size="md" onClick={onConfirmOrder}>
+            <Button variant="gradient" size="md" onClick={confirmOrder}>
               <ShoppingCart className="h-4 w-4" />
               确认方案并下单
               <ArrowUpRight className="h-4 w-4" />
