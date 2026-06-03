@@ -7,6 +7,7 @@ import { ProviderProfilePage } from "@/components/ProviderProfilePage";
 import { QuestionnairePage } from "@/components/QuestionnairePage";
 import { RecommendationPage } from "@/components/RecommendationPage";
 import { ServiceStatusPage } from "@/components/ServiceStatusPage";
+import { SellerChatPage } from "@/components/SellerChatPage";
 import { SellerHomePage } from "@/components/SellerHomePage";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { StepsHeader, type FlowStep } from "@/components/StepsHeader";
@@ -17,6 +18,7 @@ import type { ProviderProfile } from "@/types";
 type AppStep =
   | "gateway"
   | "seller-home"
+  | "seller-chat"
   | "provider-profile"
   | "checkout"
   | "service-status"
@@ -25,6 +27,7 @@ type AppStep =
 const STEP_PATHS: Record<AppStep, string> = {
   gateway: "/",
   "seller-home": "/seller",
+  "seller-chat": "/seller/chat",
   "provider-profile": "/seller/provider",
   questionnaire: "/provider/intake",
   analyzing: "/provider/analyzing",
@@ -36,6 +39,7 @@ const STEP_PATHS: Record<AppStep, string> = {
 };
 
 function stepFromPath(pathname: string): AppStep {
+  if (pathname.startsWith("/seller/chat")) return "seller-chat";
   if (pathname.startsWith("/seller/provider")) return "provider-profile";
   if (pathname.startsWith("/seller")) return "seller-home";
   if (pathname.startsWith("/provider/analyzing")) return "analyzing";
@@ -114,6 +118,8 @@ export default function App() {
             window.open(STEP_PATHS["provider-profile"], "_blank", "noopener")
           }
         />
+      ) : step === "seller-chat" ? (
+        <SellerChatPage onHome={resetHome} />
       ) : step === "provider-profile" ? (
         <ProviderProfilePage
           onBackToDesk={() => navigate("seller-home")}

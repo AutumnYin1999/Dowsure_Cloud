@@ -1,0 +1,401 @@
+/* ============================================================
+   卖家智能服务台 · 对话版（信息收集）样式
+   仅作用于 .seller-chat 内，复用 index.css 的设计令牌（--fg / --grad / --violet …）
+   与 seller-desk.css 同源配色，保证风格一致；不影响原卖家台。
+   ============================================================ */
+
+.seller-chat {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 顶部进度点 */
+.seller-chat .chat-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.seller-chat .chat-progress .dot {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-2);
+  transition: all 0.3s ease;
+}
+.seller-chat .chat-progress .dot.cur {
+  width: 24px;
+  background: var(--fg-dim);
+}
+.seller-chat .chat-progress .dot.done {
+  width: 24px;
+  background: var(--grad);
+}
+.seller-chat .chat-progress .dot.todo {
+  width: 12px;
+}
+
+/* 对话卡片 */
+.seller-chat .chat-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* 滚动区 */
+.seller-chat .chat-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 22px 6px;
+  max-height: 56vh;
+  min-height: 280px;
+  overflow-y: auto;
+}
+
+/* 单条消息 */
+.seller-chat .msg {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: sc-rise 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.seller-chat .msg.user {
+  flex-direction: row-reverse;
+}
+@keyframes sc-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.seller-chat .msg .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.seller-chat .msg.agent .avatar {
+  background: var(--grad);
+  box-shadow: 0 6px 18px -8px rgba(139, 92, 246, 0.7);
+}
+.seller-chat .msg.user .avatar {
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  color: var(--fg-mute);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.seller-chat .msg .bubble {
+  max-width: 78%;
+  padding: 11px 15px;
+  border-radius: 14px;
+  font-size: 17px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.seller-chat .msg.agent .bubble {
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  color: var(--fg-dim);
+  border-top-left-radius: 4px;
+}
+.seller-chat .msg.user .bubble {
+  background: var(--grad-soft);
+  border: 1px solid var(--violet);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+
+/* 思考中 */
+.seller-chat .thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  border-top-left-radius: 4px;
+}
+.seller-chat .thinking .tdot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg-faint);
+  animation: sc-blink 1s ease-in-out infinite;
+}
+.seller-chat .thinking .label {
+  font-size: 15px;
+  color: var(--fg-faint);
+}
+@keyframes sc-blink {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* 底部输入区 */
+.seller-chat .composer {
+  border-top: 1px solid var(--border);
+  padding: 14px 18px 18px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .composer .quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.seller-chat .composer .input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seller-chat .composer .input-row .input {
+  flex: 1;
+}
+
+/* 信息收集完成 —— 汇总卡 */
+.seller-chat .summary {
+  margin-top: 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  animation: sc-rise 0.4s ease both;
+}
+.seller-chat .summary .sum-cap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.seller-chat .summary .sum-cap .sparkle {
+  width: 11px;
+  height: 11px;
+  background: var(--grad);
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+.seller-chat .summary .sum-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.seller-chat .summary .sum-row:first-of-type {
+  border-top: none;
+}
+.seller-chat .summary .sum-k {
+  font-size: 16.5px;
+  color: var(--fg-mute);
+  flex: none;
+}
+.seller-chat .summary .sum-v {
+  font-size: 17px;
+  color: var(--fg);
+  font-weight: 500;
+  text-align: right;
+}
+.seller-chat .summary .sum-foot {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.seller-chat .summary .sum-note {
+  font-size: 15px;
+  color: var(--fg-faint);
+  line-height: 1.55;
+  margin: 14px 0 0;
+}
+
+/* ── Codex 风 · 竖排序号选项卡 ── */
+.seller-chat .opt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.seller-chat .opt-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-2);
+  background: var(--bg-3);
+  color: var(--fg);
+  font-size: 17.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+.seller-chat .opt-row:hover:not(:disabled) {
+  border-color: var(--violet);
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateX(3px);
+}
+.seller-chat .opt-row:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.seller-chat .opt-row .opt-key {
+  width: 27px;
+  height: 27px;
+  flex: none;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--grad);
+  box-shadow: 0 4px 14px -6px rgba(139, 92, 246, 0.7);
+}
+.seller-chat .opt-row .opt-arrow {
+  margin-left: auto;
+  color: var(--fg-faint);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+.seller-chat .opt-row:hover:not(:disabled) .opt-arrow {
+  opacity: 1;
+  color: var(--violet);
+}
+
+/* ── 智能诊断结果 ── */
+.seller-chat .diag {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: sc-rise 0.4s ease both;
+}
+.seller-chat .diag .recap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.seller-chat .diag .recap .tag {
+  font-size: 15px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  color: var(--fg-dim);
+}
+.seller-chat .diag .recap .tag b {
+  color: var(--fg);
+  font-weight: 600;
+}
+.seller-chat .diag .diag-head {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.1) 50%, rgba(236, 72, 153, 0.08));
+  border: 1px solid rgba(139, 92, 246, 0.32);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.seller-chat .diag .diag-head .cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.seller-chat .diag .diag-head .cap .sparkle {
+  width: 11px; height: 11px; background: var(--grad); border-radius: 3px; transform: rotate(45deg);
+}
+.seller-chat .diag .diag-head p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* KPI 金额卡 */
+.seller-chat .diag .kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.seller-chat .diag .kpi {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+}
+.seller-chat .diag .kpi.focus {
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.3), 0 18px 40px -20px rgba(236, 72, 153, 0.5);
+}
+.seller-chat .diag .kpi .badge-focus {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 12px; padding: 2px 8px; border-radius: 999px;
+  background: rgba(236, 72, 153, 0.16); color: #fbcfe8; font-weight: 600;
+}
+.seller-chat .diag .kpi .kpi-k { font-size: 14.5px; color: var(--fg-mute); }
+.seller-chat .diag .kpi .kpi-v {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 6px;
+  color: var(--fg);
+}
+.seller-chat .diag .kpi.focus .kpi-v {
+  background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.seller-chat .diag .kpi .kpi-note { font-size: 13.5px; line-height: 1.5; color: var(--fg-faint); }
+
+/* 维度卡 */
+.seller-chat .diag .dim {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.seller-chat .diag .dim.tone-warn { border-left-color: var(--amber); }
+.seller-chat .diag .dim.tone-risk { border-left-color: var(--rose); }
+.seller-chat .diag .dim.tone-good { border-left-color: var(--green); }
+.seller-chat .diag .dim .dim-h {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 7px;
+}
+.seller-chat .diag .dim .dim-h .dim-t { font-size: 17.5px; font-weight: 600; color: var(--fg); }
+.seller-chat .diag .dim .dim-h .dim-tag {
+  font-size: 13px; padding: 2px 9px; border-radius: 999px; font-weight: 600;
+}
+.seller-chat .diag .dim.tone-warn .dim-tag { background: rgba(245, 166, 35, 0.16); color: #fcd9a0; }
+.seller-chat .diag .dim.tone-risk .dim-tag { background: rgba(251, 113, 133, 0.16); color: #fecdd3; }
+.seller-chat .diag .dim.tone-good .dim-tag { background: rgba(52, 211, 153, 0.16); color: #a7f3d0; }
+.seller-chat .diag .dim .dim-insight { font-size: 16.5px; line-height: 1.6; color: var(--fg-dim); margin: 0 0 8px; }
+.seller-chat .diag .dim .dim-dir {
+  font-size: 16px; line-height: 1.55; color: var(--fg-mute);
+  display: flex; gap: 7px; align-items: flex-start;
+}
+.seller-chat .diag .dim .dim-dir .arr { color: var(--violet); flex: none; }
+
+.seller-chat .diag .diag-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+.seller-chat .diag .diag-note { font-size: 14px; color: var(--fg-faint); line-height: 1.55; margin: 4px 0 0; }
+
+/* 移动端 */
+@media (max-width: 640px) {
+  .seller-chat { padding: 0 14px; }
+  .seller-chat .msg .bubble { max-width: 85%; font-size: 16px; }
+  .seller-chat .diag .kpis { grid-template-columns: 1fr; }
+}
