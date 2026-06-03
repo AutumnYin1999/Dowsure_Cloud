@@ -17,3 +17,6 @@ dist-ssr
 
 # AI tooling (local only)
 .claude/
+
+# deploy secrets (local only) —— 复制 scripts/deploy.env.example 填写
+scripts/deploy.env
