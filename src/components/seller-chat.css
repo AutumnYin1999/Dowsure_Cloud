@@ -6,13 +6,107 @@
 
 .seller-chat {
   position: relative;
-  max-width: 760px;
+  max-width: 860px;
+  height: 100dvh;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 78px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 620px;
+  box-sizing: border-box;
+}
+
+.seller-chat .desk-head {
+  flex: none;
+  padding: 8px 0 12px !important;
+}
+.seller-chat .desk-head .pill {
+  margin-bottom: 10px;
+}
+.seller-chat .desk-head h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+.seller-chat .desk-head p {
+  font-size: 16.5px;
+  line-height: 1.5;
+  max-width: 760px;
+}
+
+/* 价值感状态栏（固定在对话框上方，不参与消息区滚动） */
+.seller-chat .value-bar {
+  flex: none;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin: 0 0 14px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-2);
+  box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.6);
+}
+.seller-chat .vb-cell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  transition: background 0.35s ease;
+}
+.seller-chat .vb-cell.lit {
+  background: rgba(139, 92, 246, 0.1);
+}
+.seller-chat .vb-k {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--fg-faint);
+  white-space: nowrap;
+}
+.seller-chat .vb-k .vb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-2);
+  flex: none;
+  transition: all 0.35s ease;
+}
+.seller-chat .vb-cell.lit .vb-k {
+  color: #c4b5fd;
+}
+.seller-chat .vb-cell.lit .vb-k .vb-dot {
+  background: var(--violet);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+.seller-chat .vb-v {
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--fg-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.35s ease;
+}
+.seller-chat .vb-cell.lit .vb-v {
+  color: var(--fg);
+}
+.seller-chat .vb-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--fg-faint);
+  flex: none;
+  opacity: 0.5;
 }
 
 /* 顶部进度点 */
 .seller-chat .chat-progress {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -37,21 +131,86 @@
 
 /* 对话卡片 */
 .seller-chat .chat-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
 }
 
-/* 滚动区 */
+/* 对话流（固定对话框内滚动，底部输入区常驻） */
 .seller-chat .chat-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 22px 22px 6px;
-  max-height: 56vh;
-  min-height: 280px;
-  overflow-y: auto;
+  padding: 22px 22px 16px;
+  scrollbar-gutter: stable;
+}
+.seller-chat .chat-scroll::-webkit-scrollbar {
+  width: 9px;
+}
+.seller-chat .chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.seller-chat .chat-scroll::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+  background-clip: padding-box;
+}
+
+/* 流内富卡片（报告 / 豆分期 / 权益）：占满宽度，不走气泡样式 */
+.seller-chat .stream-card {
+  animation: sc-rise 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.seller-chat .stream-card .diag.in-stream {
+  margin: 0;
+}
+.seller-chat .stream-card .termpay-panel {
+  margin-top: 0;
+}
+
+/* 报告后操作条 */
+.seller-chat .chat-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* 自由对话快捷气泡 */
+.seller-chat .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.seller-chat .chip {
+  font-size: 16px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--bg-3);
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+.seller-chat .chip:hover:not(:disabled) {
+  border-color: var(--violet);
+  color: var(--fg);
+}
+.seller-chat .chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* 单条消息 */
@@ -99,6 +258,7 @@
   white-space: pre-line;
 }
 .seller-chat .msg.agent .bubble {
+  max-width: min(82%, 760px);
   background: var(--bg-3);
   border: 1px solid var(--border-2);
   color: var(--fg-dim);
@@ -140,6 +300,7 @@
 
 /* 底部输入区 */
 .seller-chat .composer {
+  flex: none;
   border-top: 1px solid var(--border);
   padding: 14px 18px 18px;
   background: rgba(255, 255, 255, 0.012);
@@ -148,12 +309,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 28px;
 }
 .seller-chat .composer .input-row {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+.seller-chat .composer .opt-list + .input-row,
+.seller-chat .composer .chip-row + .input-row {
+  margin-top: 4px;
 }
 .seller-chat .composer .input-row .input {
   flex: 1;
@@ -228,6 +393,11 @@
   gap: 8px;
   margin-bottom: 14px;
 }
+.seller-chat .opt-list.service-category-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
 .seller-chat .opt-row {
   display: flex;
   align-items: center;
@@ -276,6 +446,30 @@
 .seller-chat .opt-row:hover:not(:disabled) .opt-arrow {
   opacity: 1;
   color: var(--violet);
+}
+.seller-chat .service-category-options .opt-row {
+  min-height: 54px;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.seller-chat .service-category-options .opt-row:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.seller-chat .service-category-options .opt-row .opt-key {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+.seller-chat .service-category-options .opt-row .opt-text {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.seller-chat .service-category-options .opt-row .opt-arrow {
+  display: none;
 }
 
 /* ── 智能诊断结果 ── */
@@ -393,9 +587,734 @@
 .seller-chat .diag .diag-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
 .seller-chat .diag .diag-note { font-size: 14px; color: var(--fg-faint); line-height: 1.55; margin: 4px 0 0; }
 
+/* 卖家线轻量现金流报告 */
+.seller-chat .cash-report {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-2);
+}
+.seller-chat .cash-report .cash-report-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.seller-chat .cash-report .cash-report-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  font-size: 24px;
+  font-weight: 800;
+}
+.seller-chat .cash-report .cash-report-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.seller-chat .cash-report .cash-report-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.seller-chat .cash-report .cash-report-body {
+  padding: 22px 24px 24px;
+}
+.seller-chat .cash-report .cash-report-main {
+  text-align: center;
+  padding: 10px 0 22px;
+}
+.seller-chat .cash-report .cash-report-amount {
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 900;
+  color: #f43f5e;
+}
+.seller-chat .cash-report .cash-report-label {
+  margin-top: 9px;
+  font-size: 15px;
+  color: var(--fg-mute);
+}
+.seller-chat .cash-report .cash-report-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-top: 1px solid var(--border);
+}
+.seller-chat .cash-report .cash-report-row-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.seller-chat .cash-report .cash-report-row-sub {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--fg-faint);
+}
+.seller-chat .cash-report .cash-report-row strong {
+  flex: none;
+  font-size: 24px;
+  color: #f59e0b;
+}
+.seller-chat .cash-report .cash-report-row.positive strong {
+  color: #34d399;
+}
+.seller-chat .cash-report .cash-report-row.risk strong {
+  color: #fb7185;
+}
+.seller-chat .cash-report .cash-report-callout {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd9a0;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* 卖家线服务商匹配方向卡 */
+.seller-chat .match-report {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-2);
+}
+.seller-chat .provider-recommend-report {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.seller-chat .provider-recommend-report .match-report-body {
+  padding: 0;
+}
+.seller-chat .match-report .match-report-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.seller-chat .match-report .match-report-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8b5cf6, #2563eb);
+  color: white;
+}
+.seller-chat .match-report .match-report-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.seller-chat .match-report .match-report-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.seller-chat .match-report .match-report-body {
+  padding: 22px 24px 24px;
+}
+.seller-chat .match-report .match-report-main {
+  padding: 2px 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.seller-chat .match-report .match-report-label {
+  font-size: 14px;
+  color: var(--fg-mute);
+  font-weight: 700;
+}
+.seller-chat .match-report .match-report-category {
+  margin-top: 8px;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: var(--fg);
+}
+.seller-chat .match-report .match-report-section {
+  padding: 16px 0 0;
+}
+.seller-chat .match-report .match-report-section-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.seller-chat .match-report .match-report-section p {
+  margin: 7px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--fg-mute);
+}
+.seller-chat .match-report .match-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.seller-chat .match-report .match-category-card {
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.014);
+}
+.seller-chat .match-report .match-category-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.seller-chat .match-report .match-category-top strong {
+  min-width: 0;
+  color: var(--fg);
+  font-size: 15px;
+  line-height: 1.35;
+}
+.seller-chat .match-report .match-category-top span {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.13);
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 800;
+}
+.seller-chat .match-report .match-category-card p {
+  margin-top: 9px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.seller-chat .match-report .provider-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.seller-chat .match-report .provider-pick {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid rgba(139, 92, 246, 0.26);
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.07);
+}
+.seller-chat .match-report .provider-pick-name {
+  color: var(--fg);
+  font-size: 16px;
+  font-weight: 850;
+}
+.seller-chat .match-report .provider-pick p {
+  margin-top: 5px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.seller-chat .match-report .provider-pick > span {
+  flex: none;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.12);
+  color: #a7f3d0;
+  font-size: 12px;
+  font-weight: 850;
+}
+.seller-chat .match-report .provider-card-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+.seller-chat .match-report .provider-card {
+  padding: 16px;
+  border: 1px solid rgba(139, 92, 246, 0.24);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.seller-chat .match-report .provider-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.seller-chat .match-report .provider-card-name {
+  color: var(--fg);
+  font-size: 18px;
+  font-weight: 900;
+}
+.seller-chat .match-report .provider-card-head p {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.seller-chat .match-report .provider-card-head span {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.seller-chat .match-report .provider-card-head span.premium {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+}
+.seller-chat .match-report .provider-reason {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.08);
+}
+.seller-chat .match-report .provider-reason span {
+  display: block;
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 850;
+  margin-bottom: 4px;
+}
+.seller-chat .match-report .provider-reason p {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.seller-chat .match-report .provider-card-fit {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.08);
+  color: #ddd6fe;
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+.seller-chat .match-report .provider-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.seller-chat .match-report .provider-card li {
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--fg-dim);
+  font-size: 13px;
+  line-height: 1.35;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .match-report .match-report-checks {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.seller-chat .match-report .match-report-checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.seller-chat .match-report .match-report-checks span {
+  flex: none;
+  color: #34d399;
+  font-weight: 900;
+}
+.seller-chat .match-report .match-report-callout {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #ddd6fe;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* 卖家线双路径优先级卡 */
+.seller-chat .priority-report {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-2);
+}
+.seller-chat .priority-report .priority-report-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.seller-chat .priority-report .priority-report-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #14b8a6, #6366f1);
+  color: white;
+}
+.seller-chat .priority-report .priority-report-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.seller-chat .priority-report .priority-report-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.seller-chat .priority-report .priority-report-body {
+  padding: 22px 24px 24px;
+}
+.seller-chat .priority-report .priority-report-main {
+  text-align: center;
+  padding: 8px 0 20px;
+}
+.seller-chat .priority-report .priority-report-label {
+  font-size: 14px;
+  color: var(--fg-mute);
+  font-weight: 700;
+}
+.seller-chat .priority-report .priority-report-decision {
+  margin-top: 8px;
+  font-size: 38px;
+  line-height: 1.12;
+  font-weight: 900;
+  color: #5eead4;
+}
+.seller-chat .priority-report .priority-report-signal {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(20, 184, 166, 0.32);
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-size: 13px;
+  font-weight: 700;
+}
+.seller-chat .priority-report .priority-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.seller-chat .priority-report .priority-step {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .priority-report .priority-step.focus {
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgba(20, 184, 166, 0.08);
+}
+.seller-chat .priority-report .priority-step-k {
+  font-size: 13px;
+  color: var(--fg-faint);
+  font-weight: 700;
+}
+.seller-chat .priority-report .priority-step-v {
+  margin-top: 6px;
+  font-size: 19px;
+  color: var(--fg);
+  font-weight: 850;
+}
+.seller-chat .priority-report .priority-step p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-mute);
+}
+.seller-chat .priority-report .priority-report-callout {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(94, 234, 212, 0.32);
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.09);
+  color: #ccfbf1;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* 豆分期落点面板（卖家线下钻） */
+.seller-chat .termpay-panel {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-2);
+  animation: sc-rise 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.seller-chat .termpay-panel .tp-head .cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.seller-chat .termpay-panel .tp-head p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  margin: 0;
+}
+.seller-chat .termpay-panel .tp-nums {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.seller-chat .termpay-panel .tp-num {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .termpay-panel .tp-num.focus {
+  border-color: transparent;
+  background: linear-gradient(var(--bg-2), var(--bg-2)) padding-box, var(--grad) border-box;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.18);
+}
+.seller-chat .termpay-panel .tp-k {
+  font-size: 14px;
+  color: var(--fg-mute);
+  margin-bottom: 6px;
+}
+.seller-chat .termpay-panel .tp-v {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+.seller-chat .termpay-panel .tp-num.focus .tp-v {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.seller-chat .termpay-panel .tp-note {
+  font-size: 13px;
+  color: var(--fg-faint);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+.seller-chat .termpay-panel .tp-cta {
+  align-self: flex-start;
+}
+.seller-chat .termpay-panel .tp-success {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #a7f3d0;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.seller-chat .termpay-panel .tp-fine {
+  font-size: 13px;
+  color: var(--fg-faint);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* TermPay 资金路径：竖向时间线 */
+.seller-chat .tp-flow {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .tp-flow-cap {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.seller-chat .tp-flow-step {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+.seller-chat .tp-flow-step:last-child {
+  padding-bottom: 0;
+}
+/* 连接竖线 */
+.seller-chat .tp-flow-step::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 30px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--border-2);
+}
+.seller-chat .tp-flow-step:last-child::before {
+  display: none;
+}
+.seller-chat .tp-flow-num {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--grad);
+  box-shadow: 0 6px 16px -8px rgba(139, 92, 246, 0.7);
+}
+.seller-chat .tp-flow-body {
+  padding-top: 3px;
+}
+.seller-chat .tp-flow-t {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.seller-chat .tp-flow-d {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--fg-faint);
+  margin-top: 3px;
+}
+
+/* 推荐权益版本（服务商线落点内） */
+.seller-chat .termpay-panel .bp-version {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: linear-gradient(var(--bg-2), var(--bg-2)) padding-box, var(--grad) border-box;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.18);
+}
+.seller-chat .termpay-panel .bp-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.seller-chat .termpay-panel .bp-price {
+  font-size: 22px;
+  font-weight: 700;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+.seller-chat .termpay-panel .bp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.seller-chat .termpay-panel .bp-list li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.seller-chat .termpay-panel .bp-list li.hot {
+  border-color: rgba(139, 92, 246, 0.45);
+  background: rgba(139, 92, 246, 0.08);
+  color: var(--fg);
+}
+.seller-chat .termpay-panel .bp-tick {
+  flex: none;
+  color: var(--violet);
+}
+.seller-chat .termpay-panel .bp-reason {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--fg-mute);
+  margin: 0;
+}
+
 /* 移动端 */
 @media (max-width: 640px) {
-  .seller-chat { padding: 0 14px; }
+  .seller-chat {
+    height: 100dvh;
+    min-height: 560px;
+    padding: 72px 12px 14px;
+  }
+  .seller-chat .desk-head h1 { font-size: 24px; }
+  .seller-chat .desk-head p { font-size: 14.5px; }
   .seller-chat .msg .bubble { max-width: 85%; font-size: 16px; }
   .seller-chat .diag .kpis { grid-template-columns: 1fr; }
+  .seller-chat .priority-report .priority-steps { grid-template-columns: 1fr; }
+  .seller-chat .priority-report .priority-report-decision { font-size: 30px; }
+  .seller-chat .match-report .match-report-category { font-size: 25px; }
+  .seller-chat .match-report .match-category-grid { grid-template-columns: 1fr; }
+  .seller-chat .match-report .provider-pick { flex-direction: column; }
+  .seller-chat .match-report .provider-card-head { flex-direction: column; }
+  .seller-chat .opt-list.service-category-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .seller-chat .service-category-options .opt-row { font-size: 14.5px; padding: 11px 8px; }
+  .seller-chat .termpay-panel .tp-nums { grid-template-columns: 1fr; }
+  .seller-chat .termpay-panel .tp-v { font-size: 26px; }
+  .seller-chat .value-bar { gap: 0; }
+  .seller-chat .vb-cell { padding: 9px 8px; }
+  .seller-chat .vb-k { font-size: 11.5px; gap: 5px; }
+  .seller-chat .vb-k .vb-dot { width: 5px; height: 5px; }
+  .seller-chat .vb-v { font-size: 13.5px; }
+  .seller-chat .vb-arrow { display: none; }
 }

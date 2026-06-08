@@ -71,7 +71,7 @@ export function TermPayFlowCard() {
             {" "}→ 卖家按约还款
           </h3>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-[rgba(226,219,255,0.7)] sm:text-base">
-            TermPay（豆分期升级版）让大额账单进入「先用后付」模式，服务商现金流不再被账期拖住。
+            TermPay 让大额账单进入「先用后付」模式，服务商现金流不再被账期拖住。
           </p>
         </div>
         <span

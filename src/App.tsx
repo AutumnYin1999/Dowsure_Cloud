@@ -8,7 +8,6 @@ import { QuestionnairePage } from "@/components/QuestionnairePage";
 import { RecommendationPage } from "@/components/RecommendationPage";
 import { ServiceStatusPage } from "@/components/ServiceStatusPage";
 import { SellerChatPage } from "@/components/SellerChatPage";
-import { SellerHomePage } from "@/components/SellerHomePage";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { StepsHeader, type FlowStep } from "@/components/StepsHeader";
 import { TermPayDashboardPreview } from "@/components/TermPayDashboardPreview";
@@ -18,7 +17,7 @@ import type { ProviderProfile } from "@/types";
 type AppStep =
   | "gateway"
   | "seller-home"
-  | "seller-chat"
+  | "chat"
   | "provider-profile"
   | "checkout"
   | "service-status"
@@ -27,7 +26,7 @@ type AppStep =
 const STEP_PATHS: Record<AppStep, string> = {
   gateway: "/",
   "seller-home": "/seller",
-  "seller-chat": "/seller/chat",
+  chat: "/chat",
   "provider-profile": "/seller/provider",
   questionnaire: "/provider/intake",
   analyzing: "/provider/analyzing",
@@ -39,7 +38,7 @@ const STEP_PATHS: Record<AppStep, string> = {
 };
 
 function stepFromPath(pathname: string): AppStep {
-  if (pathname.startsWith("/seller/chat")) return "seller-chat";
+  if (pathname.startsWith("/chat")) return "chat";
   if (pathname.startsWith("/seller/provider")) return "provider-profile";
   if (pathname.startsWith("/seller")) return "seller-home";
   if (pathname.startsWith("/provider/analyzing")) return "analyzing";
@@ -113,12 +112,8 @@ export default function App() {
           onSelectSeller={() => navigate("seller-home")}
         />
       ) : step === "seller-home" ? (
-        <SellerHomePage
-          onViewProfile={() =>
-            window.open(STEP_PATHS["provider-profile"], "_blank", "noopener")
-          }
-        />
-      ) : step === "seller-chat" ? (
+        <SellerChatPage lockedLine="seller" onHome={resetHome} />
+      ) : step === "chat" ? (
         <SellerChatPage onHome={resetHome} />
       ) : step === "provider-profile" ? (
         <ProviderProfilePage
