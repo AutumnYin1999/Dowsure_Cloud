@@ -44,18 +44,18 @@ SCP=(scp -i "$ECS_SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept
 REMOTE_TMP="/tmp/dowsure_deploy_$(date +%s)"
 
 if [ -d node_modules ]; then
-  echo "▶ 1/4 依赖已存在，跳过安装（如需全新安装：rm -rf node_modules 后重跑）"
+  echo "▶ 1/5 依赖已存在，跳过安装（如需全新安装：rm -rf node_modules 后重跑）"
 else
-  echo "▶ 1/4 安装依赖（npm ci）"; npm ci
+  echo "▶ 1/5 安装依赖（npm ci）"; npm ci
 fi
-echo "▶ 2/4 typecheck + 构建"; npm run typecheck; npm run build
+echo "▶ 2/5 typecheck + 构建"; npm run typecheck; npm run build
 [ -d dist ] || { echo "✗ 构建后没有 dist/"; exit 1; }
 
-echo "▶ 3/4 上传 dist/ → ${H}:${REMOTE_TMP}"
+echo "▶ 3/5 上传 dist/ → ${H}:${REMOTE_TMP}"
 "${SSH[@]}" "$H" "rm -rf '$REMOTE_TMP'"
 "${SCP[@]}" -q -r dist "$H:$REMOTE_TMP"
 
-echo "▶ 4/4 服务器端：备份 → 同步 → chown"
+echo "▶ 4/5 服务器端：备份 → 同步 → chown"
 REMOTE_SCRIPT=$(cat <<EOF
 set -e
 TARGET='${ECS_DEPLOY_PATH}'
@@ -75,6 +75,16 @@ echo "  部署目录："; ls -la "\$TARGET"
 EOF
 )
 "${SSH[@]}" "$H" "$REMOTE_SCRIPT"
+
+echo "▶ 5/5 冒烟自测：nginx -t + HTTP 自检"
+SMOKE_SCRIPT=$(cat <<'EOF'
+nginx -t 2>&1 | tail -1
+echo "  首页 : $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/)"
+echo "  子路由: $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/seller/chat)"
+curl -s http://127.0.0.1/ | grep -oE '<title>[^<]*</title>' | head -1
+EOF
+)
+"${SSH[@]}" "$H" "$SMOKE_SCRIPT"
 
 echo ""
 echo "✅ 部署完成 → http(s)://${ECS_HOST}"

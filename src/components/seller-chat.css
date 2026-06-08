@@ -298,27 +298,17 @@
   50% { opacity: 1; }
 }
 
-/* 底部输入区 */
+/* 底部输入区（只放输入框，选项已移到上方对话流） */
 .seller-chat .composer {
   flex: none;
   border-top: 1px solid var(--border);
-  padding: 14px 18px 18px;
+  padding: 16px 18px 18px;
   background: rgba(255, 255, 255, 0.012);
-}
-.seller-chat .composer .quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 28px;
 }
 .seller-chat .composer .input-row {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-.seller-chat .composer .opt-list + .input-row,
-.seller-chat .composer .chip-row + .input-row {
-  margin-top: 4px;
 }
 .seller-chat .composer .input-row .input {
   flex: 1;
@@ -386,90 +376,57 @@
   margin: 14px 0 0;
 }
 
-/* ── Codex 风 · 竖排序号选项卡 ── */
-.seller-chat .opt-list {
+/* ── 对话流内的可点选项（像聊天时 agent 给你的建议气泡，可点或在下方直接打字）── */
+.seller-chat .flow-options {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 9px;
+  /* 左缩进，让选项对齐在 agent 气泡下方（avatar 32 + gap 10） */
+  margin: 2px 0 4px 42px;
+  animation: sc-rise 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
-.seller-chat .opt-list.service-category-options {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-.seller-chat .opt-row {
-  display: flex;
+.seller-chat .opt-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 13px;
-  width: 100%;
+  gap: 8px;
+  max-width: 100%;
   text-align: left;
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 11px 17px;
+  border-radius: 13px;
   border: 1px solid var(--border-2);
   background: var(--bg-3);
   color: var(--fg);
-  font-size: 17.5px;
+  font-family: inherit;
+  font-size: 16.5px;
   font-weight: 500;
+  line-height: 1.45;
   cursor: pointer;
-  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+  transition: border-color 0.16s ease, background 0.16s ease,
+    transform 0.16s ease, box-shadow 0.16s ease;
 }
-.seller-chat .opt-row:hover:not(:disabled) {
+.seller-chat .opt-chip:hover:not(:disabled) {
   border-color: var(--violet);
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateX(3px);
+  background: rgba(139, 92, 246, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -14px rgba(139, 92, 246, 0.85);
 }
-.seller-chat .opt-row:disabled {
+.seller-chat .opt-chip:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.seller-chat .opt-row .opt-key {
-  width: 27px;
-  height: 27px;
+.seller-chat .opt-chip .opt-text {
+  min-width: 0;
+}
+.seller-chat .opt-chip .opt-arrow {
   flex: none;
-  border-radius: 7px;
-  display: grid;
-  place-items: center;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--grad);
-  box-shadow: 0 4px 14px -6px rgba(139, 92, 246, 0.7);
-}
-.seller-chat .opt-row .opt-arrow {
-  margin-left: auto;
   color: var(--fg-faint);
-  opacity: 0;
-  transition: opacity 0.16s ease;
+  opacity: 0.55;
+  transition: opacity 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
-.seller-chat .opt-row:hover:not(:disabled) .opt-arrow {
+.seller-chat .opt-chip:hover:not(:disabled) .opt-arrow {
   opacity: 1;
   color: var(--violet);
-}
-.seller-chat .service-category-options .opt-row {
-  min-height: 54px;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 10px;
-  border-radius: 10px;
-  font-size: 16px;
-}
-.seller-chat .service-category-options .opt-row:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-.seller-chat .service-category-options .opt-row .opt-key {
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
-}
-.seller-chat .service-category-options .opt-row .opt-text {
-  min-width: 0;
-  text-align: center;
-  white-space: nowrap;
-}
-.seller-chat .service-category-options .opt-row .opt-arrow {
-  display: none;
+  transform: translateX(2px);
 }
 
 /* ── 智能诊断结果 ── */

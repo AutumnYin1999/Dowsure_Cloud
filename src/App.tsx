@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AgentChatPage } from "@/components/AgentChatPage";
 import { AnalyzingPage } from "@/components/AnalyzingPage";
 import { CheckoutPage } from "@/components/CheckoutPage";
 import { DiagnosisPage } from "@/components/DiagnosisPage";
@@ -17,6 +18,7 @@ import type { ProviderProfile } from "@/types";
 type AppStep =
   | "gateway"
   | "seller-home"
+  | "agent"
   | "chat"
   | "provider-profile"
   | "checkout"
@@ -26,6 +28,7 @@ type AppStep =
 const STEP_PATHS: Record<AppStep, string> = {
   gateway: "/",
   "seller-home": "/seller",
+  agent: "/agent",
   chat: "/chat",
   "provider-profile": "/seller/provider",
   questionnaire: "/provider/intake",
@@ -38,6 +41,7 @@ const STEP_PATHS: Record<AppStep, string> = {
 };
 
 function stepFromPath(pathname: string): AppStep {
+  if (pathname.startsWith("/agent")) return "agent";
   if (pathname.startsWith("/chat")) return "chat";
   if (pathname.startsWith("/seller/provider")) return "provider-profile";
   if (pathname.startsWith("/seller")) return "seller-home";
@@ -113,6 +117,8 @@ export default function App() {
         />
       ) : step === "seller-home" ? (
         <SellerChatPage lockedLine="seller" onHome={resetHome} />
+      ) : step === "agent" ? (
+        <AgentChatPage onHome={resetHome} />
       ) : step === "chat" ? (
         <SellerChatPage onHome={resetHome} />
       ) : step === "provider-profile" ? (

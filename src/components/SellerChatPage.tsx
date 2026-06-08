@@ -19,7 +19,8 @@ type Line = "seller" | "provider";
 // ──────────────────────── 选项 ────────────────────────
 
 // 卖家线：识别平台、月销、优先事项，再分流到服务商匹配或 TermPay 账期。
-const PLATFORMS = ["Amazon + TikTok Shop", "Amazon", "TikTok Shop", "Temu", "SHEIN", "其他平台"];
+// 只保留最常见的 3 个；Temu / SHEIN / 独立站等其余平台让用户直接打字（parse 仍能识别）。
+const PLATFORMS = ["Amazon", "TikTok Shop", "Amazon + TikTok Shop"];
 const GMV_OPTIONS = ["月销 10 万以内", "月销 10-50 万", "月销 50-100 万", "月销 100-300 万", "月销 300 万以上"];
 const SELLER_NEED_OPTIONS = ["找/换更靠谱的服务商", "服务商账单想晚点付", "两个都有，先帮我判断"];
 const SERVICE_CATEGORY_OPTIONS = [
@@ -102,7 +103,7 @@ const SELLER_BASE_QUESTIONS: QuestionDef[] = [
     label: "主要平台",
     prompt: "第 1 / 5 题 — 你主要在哪个平台卖货？",
     options: PLATFORMS,
-    placeholder: "点上面选一个，或直接打字，比如「Amazon + TikTok Shop」",
+    placeholder: "点上面选，或直接打字，比如「Temu」「SHEIN」「独立站」",
     sample: "Amazon + TikTok Shop",
     parse: (t) => {
       const s = t.toLowerCase();
@@ -2137,63 +2138,54 @@ export function SellerChatPanel({ onHome, lockedLine }: SellerChatPanelProps) {
                 </div>
               </div>
             ) : null}
-            <div ref={endRef} />
-          </div>
 
-          {/* 输入区：Q0 身份分流 / 线内问题选项 / 报告后自由对话气泡 */}
-          <div className="composer">
-            {line === null ? (
-              <div className="opt-list">
-                {IDENTITY.options.map((opt, i) => (
+            {/* 可点选项：跟在 agent 提问气泡下方，像聊天一样给你选项（也可在下方直接打字） */}
+            {!thinking && line === null ? (
+              <div className="flow-options">
+                {IDENTITY.options.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
-                    className="opt-row"
-                    disabled={!!thinking}
+                    className="opt-chip"
                     onClick={() => chooseLine(opt.value, opt.label)}
                   >
-                    <span className="opt-key">{String.fromCharCode(65 + i)}</span>
                     <span className="opt-text">{opt.label}</span>
-                    <ArrowRight className="opt-arrow" size={16} />
+                    <ArrowRight className="opt-arrow" size={15} />
                   </button>
                 ))}
               </div>
-            ) : collecting ? (
-              <div
-                className={
-                  "opt-list" +
-                  (current?.id === "serviceCategory" ? " service-category-options" : "")
-                }
-              >
-                {current!.options.map((opt, i) => (
+            ) : !thinking && collecting ? (
+              <div className="flow-options">
+                {current!.options.map((opt) => (
                   <button
                     key={opt}
                     type="button"
-                    className="opt-row"
-                    disabled={!!thinking}
+                    className="opt-chip"
                     onClick={() => answerCurrent(opt, opt)}
                   >
-                    <span className="opt-key">{String.fromCharCode(65 + i)}</span>
                     <span className="opt-text">{opt}</span>
-                    <ArrowRight className="opt-arrow" size={16} />
                   </button>
                 ))}
               </div>
-            ) : (
-              <div className="chip-row">
+            ) : !thinking && line !== null ? (
+              <div className="flow-options">
                 {suggestionChips(line, answers).map((c) => (
                   <button
                     key={c}
                     type="button"
                     className="chip"
-                    disabled={!!thinking}
                     onClick={() => handleIntent(c)}
                   >
                     {c}
                   </button>
                 ))}
               </div>
-            )}
+            ) : null}
+            <div ref={endRef} />
+          </div>
+
+          {/* 底部只留输入框：选项在上方对话流里点，这里直接打字 */}
+          <div className="composer">
             <div className="input-row">
               {!done ? (
                 <button

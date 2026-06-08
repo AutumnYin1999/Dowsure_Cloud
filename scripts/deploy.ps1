@@ -62,24 +62,24 @@ $SshArgs = @("-i", $EcsSshKey, "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyC
 $ScpArgs = @("-i", $EcsSshKey, "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new", "-P", $EcsPort)
 $RemoteTmp = "/tmp/dowsure_deploy_" + [int][double]::Parse((Get-Date -UFormat %s))
 
-Write-Host "1/4 Installing dependencies with npm ci" -ForegroundColor Cyan
+Write-Host "1/5 Installing dependencies with npm ci" -ForegroundColor Cyan
 npm ci
 if (-not $?) { Write-Error "npm ci failed" }
 
-Write-Host "2/4 Typecheck and build" -ForegroundColor Cyan
+Write-Host "2/5 Typecheck and build" -ForegroundColor Cyan
 npm run typecheck
 if (-not $?) { Write-Error "typecheck failed" }
 npm run build
 if (-not $?) { Write-Error "build failed" }
 if (-not (Test-Path "dist")) { Write-Error "dist/ was not created" }
 
-Write-Host "3/4 Uploading dist/ to ${HostTarget}:${RemoteTmp}" -ForegroundColor Cyan
+Write-Host "3/5 Uploading dist/ to ${HostTarget}:${RemoteTmp}" -ForegroundColor Cyan
 & ssh @SshArgs $HostTarget "rm -rf '$RemoteTmp'"
 if (-not $?) { Write-Error "failed to clean remote temp dir" }
 & scp @ScpArgs "-q" "-r" "dist" "${HostTarget}:${RemoteTmp}"
 if (-not $?) { Write-Error "scp upload failed" }
 
-Write-Host "4/4 Remote backup, sync, chown" -ForegroundColor Cyan
+Write-Host "4/5 Remote backup, sync, chown" -ForegroundColor Cyan
 $RemoteScript = @"
 set -e
 TARGET='${EcsDeployPath}'
@@ -105,6 +105,15 @@ ls -la "`$TARGET"
 
 & ssh @SshArgs $HostTarget $RemoteScript
 if (-not $?) { Write-Error "remote deploy failed" }
+
+Write-Host "5/5 Smoke test: nginx -t + HTTP self-check" -ForegroundColor Cyan
+$SmokeScript = @"
+nginx -t 2>&1 | tail -1
+echo "home: `$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/)"
+echo "spa : `$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/seller/chat)"
+curl -s http://127.0.0.1/ | grep -oE '<title>[^<]*</title>' | head -1
+"@
+& ssh @SshArgs $HostTarget $SmokeScript
 
 Write-Host ""
 Write-Host "Deploy complete." -ForegroundColor Green
