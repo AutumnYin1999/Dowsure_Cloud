@@ -20,3 +20,7 @@ dist-ssr
 
 # deploy secrets (local only) —— 复制 scripts/deploy.env.example 填写
 scripts/deploy.env
+
+# 部署密钥包（含私钥，切勿提交）
+dowsure-deploy-bundle*
+_deploy-bundle/
