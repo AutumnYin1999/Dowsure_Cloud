@@ -10,6 +10,7 @@ import {
 } from "react";
 import { showToast } from "@/components/ui/Toast";
 import { SERVICE_TAXONOMY } from "@/schema/serviceTaxonomy";
+import { openTermpayApply } from "@/links";
 
 type Intent = "provider" | "term" | "both";
 
@@ -1124,7 +1125,7 @@ export function SellerHomePage({ onViewProfile }: { onViewProfile: () => void })
                       />
                     </div>
                     <div className="q-actions">
-                      <button className="btn btn-primary" type="button" onClick={() => openContact("TermPay 预申请")}>
+                      <button className="btn btn-primary" type="button" onClick={openTermpayApply}>
                         提交并预申请 <span>→</span>
                       </button>
                       <span className="note">提交后由具备资质的合作机构审核。</span>
@@ -1506,14 +1507,14 @@ export function SellerHomePage({ onViewProfile }: { onViewProfile: () => void })
                     <button className="btn btn-primary" type="button" onClick={openDeepBill}>
                       查看 30 天账期方案 <span>→</span>
                     </button>
-                    <button className="btn btn-soft" type="button" onClick={() => openContact("TermPay 预申请")}>
+                    <button className="btn btn-soft" type="button" onClick={openTermpayApply}>
                       TermPay 预申请
                     </button>
                   </>
                 ) : null}
                 {term.level === "高" ? (
                   <>
-                    <button className="btn btn-primary" type="button" onClick={() => openContact("TermPay 预申请")}>
+                    <button className="btn btn-primary" type="button" onClick={openTermpayApply}>
                       TermPay 预申请 <span>→</span>
                     </button>
                     <button className="btn btn-soft" type="button" onClick={openDeepBill}>

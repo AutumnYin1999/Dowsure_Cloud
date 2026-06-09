@@ -1275,3 +1275,151 @@
   .seller-chat .vb-v { font-size: 13.5px; }
   .seller-chat .vb-arrow { display: none; }
 }
+
+/* ============================================================
+   服务商资料卡（provider 线推荐时弹出，挂在 agent 气泡下方）
+   ============================================================ */
+.seller-chat .msg .msg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  max-width: min(82%, 760px);
+}
+.seller-chat .msg.user .msg-body {
+  align-items: flex-end;
+}
+.seller-chat .msg .msg-body > .bubble {
+  max-width: 100%;
+}
+
+.seller-chat .provider-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: sc-rise 0.36s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.seller-chat .provider-card {
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  background: var(--bg-3);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+.seller-chat .provider-card.clickable {
+  cursor: pointer;
+}
+.seller-chat .provider-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px -16px rgba(0, 0, 0, 0.6);
+}
+.seller-chat .provider-card.clickable:hover {
+  border-color: var(--violet);
+}
+.seller-chat .provider-card .pc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--violet);
+  opacity: 0.85;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.seller-chat .provider-card.clickable:hover .pc-cta {
+  opacity: 1;
+  transform: translateX(2px);
+}
+.seller-chat .provider-card.is-certified {
+  border-color: rgba(139, 92, 246, 0.55);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.1), var(--bg-3) 60%);
+  box-shadow: 0 10px 26px -16px rgba(139, 92, 246, 0.7);
+}
+.seller-chat .provider-card .pc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.seller-chat .provider-card .pc-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.seller-chat .provider-card .pc-name-ico {
+  color: var(--violet);
+  flex: none;
+}
+.seller-chat .provider-card .pc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  color: var(--fg-mute);
+  background: var(--bg-2);
+  white-space: nowrap;
+}
+.seller-chat .provider-card .pc-badge.certified {
+  border-color: rgba(139, 92, 246, 0.6);
+  color: #fff;
+  background: var(--grad);
+  box-shadow: 0 6px 16px -8px rgba(139, 92, 246, 0.8);
+}
+.seller-chat .provider-card .pc-strength {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.seller-chat .provider-card .pc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.seller-chat .provider-card .pc-line {
+  font-size: 13.5px;
+  color: var(--fg-dim);
+  display: flex;
+  gap: 8px;
+}
+.seller-chat .provider-card .pc-key {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--fg-mute);
+  min-width: 56px;
+}
+.seller-chat .provider-card .pc-subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.seller-chat .provider-card .pc-sub {
+  font-size: 12.5px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--fg-mute);
+}
+@media (max-width: 640px) {
+  .seller-chat .msg .msg-body {
+    max-width: 88%;
+  }
+  .seller-chat .provider-card .pc-name {
+    font-size: 16px;
+  }
+}

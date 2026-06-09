@@ -2,6 +2,7 @@ import { ArrowRight, Banknote, Bot, ChevronRight, Package, RotateCcw, Send, Wand
 import { Fragment, useEffect, useRef, useState } from "react";
 import "./seller-desk.css";
 import "./seller-chat.css";
+import { openTermpayApply } from "@/links";
 
 /**
  * 豆服云统一对话式助手 —— /chat
@@ -1980,6 +1981,7 @@ export function SellerChatPanel({ onHome, lockedLine }: SellerChatPanelProps) {
             onClick={() => {
               setTermpaySubmitted(true);
               pushAgent(replyApply("seller"));
+              openTermpayApply(); // 跳转豆分期官网预申请
             }}
           >
             生成TermPay预申请

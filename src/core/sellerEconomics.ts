@@ -18,7 +18,12 @@ export const COEF = {
   logisticsCostRate: 0.175,
   /** 物流仓储中可压缩比例：15%。🔴 暂定值，无背书 —— 明天重点和 LD 确认。 */
   compressibleRatio: 0.15,
-  /** TermPay/账期额度系数：月GMV × 1.5（封顶 $100 万）。🟢 最硬（对标 Payoneer×1.4/Wayflyer×1.5-3）。 */
+  /**
+   * TermPay 额度粗估系数（月GMV × 1.5）—— ⚠️ 仅内部占位，Agent 话术已不再对外报这个数。
+   * 真实官方模型：授权后接入亚马逊店铺近半年真实经营数据评估、上限约 60%、封顶 100 万元
+   *   （内部口径，绝不要写进任何用户可见文案或 AI 话术；对外只说"看店铺近半年数据、最高 100 万、以审核为准"）。
+   * 这里保留一个倍数只为内部估个量级，不应再当成"官方额度公式"展示。
+   */
   termpayMultiple: 1.5,
 } as const;
 
@@ -96,7 +101,10 @@ export interface SellerFacts {
   gmvExact?: string;
   /** 回款/账期天数，如「90天」「3个月」。驱动账压与可释放现金。 */
   termDays?: string;
+  /** 想找的服务商大类（七大类 label，如「找物流」）。provider 线必填。 */
   serviceCategory?: string;
+  /** 最怕踩的坑（自然语言，如「报价不透明」）。provider 线用于匹配。 */
+  servicePain?: string;
 }
 
 export interface SellerEconomics {

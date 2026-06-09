@@ -6,6 +6,7 @@ import { CheckoutPage } from "@/components/CheckoutPage";
 import { DiagnosisPage } from "@/components/DiagnosisPage";
 import { GatewayPage } from "@/components/GatewayPage";
 import { ProviderProfilePage } from "@/components/ProviderProfilePage";
+import { EntitlementsMatrix } from "@/components/postLogin/EntitlementsMatrix";
 import { QuestionnairePage } from "@/components/QuestionnairePage";
 import { RecommendationPage } from "@/components/RecommendationPage";
 import { ServiceStatusPage } from "@/components/ServiceStatusPage";
@@ -25,6 +26,7 @@ type AppStep =
   | "provider-profile"
   | "checkout"
   | "service-status"
+  | "entitlements"
   | FlowStep;
 
 const STEP_PATHS: Record<AppStep, string> = {
@@ -40,6 +42,7 @@ const STEP_PATHS: Record<AppStep, string> = {
   result: "/provider/result",
   checkout: "/provider/checkout",
   "service-status": "/provider/service",
+  entitlements: "/provider/entitlements",
   welcome: "/",
 };
 
@@ -54,6 +57,7 @@ function stepFromPath(pathname: string): AppStep {
   if (pathname.startsWith("/provider/result")) return "result";
   if (pathname.startsWith("/provider/checkout")) return "checkout";
   if (pathname.startsWith("/provider/service")) return "service-status";
+  if (pathname.startsWith("/provider/entitlements")) return "entitlements";
   if (pathname.startsWith("/provider")) return "questionnaire";
   return "gateway";
 }
@@ -124,7 +128,13 @@ export default function App() {
       ) : step === "seller-agent" ? (
         <AgentChatPage onHome={resetHome} />
       ) : step === "provider-agent" ? (
-        <ProviderAgentPage onHome={resetHome} />
+        <ProviderAgentPage
+          onHome={resetHome}
+          onConfirmOrder={(p) => {
+            setProfile(p);
+            navigate("result");
+          }}
+        />
       ) : step === "chat" ? (
         <SellerChatPage onHome={resetHome} />
       ) : step === "provider-profile" ? (
@@ -145,6 +155,10 @@ export default function App() {
       ) : step === "service-status" ? (
         <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
           <ServiceStatusPage onHome={resetHome} />
+        </main>
+      ) : step === "entitlements" ? (
+        <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
+          <EntitlementsMatrix />
         </main>
       ) : (
         <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
