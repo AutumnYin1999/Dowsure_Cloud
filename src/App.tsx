@@ -1,4 +1,3 @@
-import { LayoutDashboard } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AgentChatPage } from "@/components/AgentChatPage";
 import { ConsolePage } from "@/components/ConsolePage";
@@ -126,6 +125,7 @@ export default function App() {
         <GatewayPage
           onSelectProvider={() => navigate("provider-agent")}
           onSelectSeller={() => navigate("seller-agent")}
+          onConsole={() => navigate("console")}
         />
       ) : step === "seller-home" ? (
         <SellerChatPage lockedLine="seller" onHome={resetHome} />
@@ -211,18 +211,6 @@ export default function App() {
       )}
 
       <SiteFooter />
-
-      {/* 右下角浮动入口：进入控制台（数据看板）。控制台页本身不显示。 */}
-      {step !== "console" ? (
-        <button
-          type="button"
-          onClick={() => navigate("console")}
-          className="dow-cta-primary fixed bottom-5 right-5 z-40 !px-4 !py-2.5 text-sm shadow-xl"
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          进入控制台
-        </button>
-      ) : null}
     </div>
   );
 }

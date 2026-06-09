@@ -64,7 +64,7 @@ export function SiteHeader({
         scrolled && "dow-nav-scrolled"
       )}
     >
-      <div className="container flex h-16 max-w-6xl items-center justify-between gap-3">
+      <div className="container relative flex h-16 max-w-6xl items-center justify-between gap-3">
         {/* logo — onHome 提供时可点击返回 */}
         {onHome ? (
           <button
@@ -79,8 +79,8 @@ export function SiteHeader({
           <div className="flex items-center gap-2.5">{logoContent}</div>
         )}
 
-        {/* center links */}
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* center links —— 绝对居中，避免随左右两侧宽度变化而偏移 */}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex">
           <button
             type="button"
             onClick={onSellerEntry}
@@ -123,7 +123,7 @@ export function SiteHeader({
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ onConsole }: { onConsole?: () => void }) {
   return (
     <footer className="dow-divider">
       <div className="container max-w-6xl py-6 text-center text-[11px] text-[rgba(226,219,255,0.55)]">
@@ -133,6 +133,17 @@ export function SiteFooter() {
         <p className="mt-1">
           合规说明：Dowsure 提供技术、数据、风控与连接能力；资金和最终审批由合作银行 / 资金方承担。
         </p>
+        {onConsole ? (
+          <p className="mt-2.5">
+            <button
+              type="button"
+              onClick={onConsole}
+              className="text-[11px] text-white/85 transition-opacity hover:opacity-60"
+            >
+              控制台
+            </button>
+          </p>
+        ) : null}
       </div>
     </footer>
   );

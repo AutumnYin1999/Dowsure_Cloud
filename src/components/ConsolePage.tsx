@@ -1,22 +1,36 @@
-import { ArrowLeft, ClipboardList, Database, Users } from "lucide-react";
+import { ArrowLeft, ClipboardList, Database, LogOut, Users } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
 
 /**
  * /console —— 控制台 · 数据看板（占位）。
  *
- * 规划用途：汇总卖家 / 服务商在前面对话与表单里留下的资料（留资线索、提交的需求/反馈、
- * 报名记录、诊断结果等），供运营侧查看与跟进。当前为占位页，接后端数据后再填充。
+ * 入口只在页脚一个不起眼的「控制台」白字（需滚到底）。先过一道员工登录（邮箱 + 密码，
+ * 演示版点登录直接进），再看数据看板。规划用途：汇总卖家 / 服务商留下的资料供运营跟进。
  */
 export function ConsolePage({ onHome }: { onHome: () => void }) {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  if (!loggedIn) {
+    return <ConsoleLogin onLogin={() => setLoggedIn(true)} onHome={onHome} />;
+  }
+
   return (
     <main className="container max-w-6xl space-y-5 pb-28 pt-20 sm:pt-24">
-      <button
-        type="button"
-        onClick={onHome}
-        className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-mute)] transition-colors hover:text-white"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        返回首页
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onHome}
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-mute)] transition-colors hover:text-white"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          返回首页
+        </button>
+        <Button variant="darkGhost" size="sm" onClick={() => setLoggedIn(false)}>
+          <LogOut className="h-3.5 w-3.5" />
+          退出登录
+        </Button>
+      </div>
 
       <section className="dow-console-panel p-6 sm:p-8">
         <span className="dow-eyebrow dow-eyebrow-dot">CONSOLE · 数据看板</span>
@@ -63,6 +77,58 @@ export function ConsolePage({ onHome }: { onHome: () => void }) {
         <Database className="h-4 w-4 text-[color:var(--violet)]" />
         数据看板开发中 —— 接入后端后，这里将展示真实的留资与跟进数据。
       </div>
+    </main>
+  );
+}
+
+/** 控制台登录（员工邮箱 + 密码）。沿用服务商登录页样式；演示版点登录直接进。 */
+function ConsoleLogin({ onLogin, onHome }: { onLogin: () => void; onHome: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <main className="container mx-auto max-w-md pb-24 pt-20 sm:pt-24">
+      <button
+        type="button"
+        onClick={onHome}
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-mute)] transition-colors hover:text-white"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        返回首页
+      </button>
+      <section className="dow-console-panel p-6 sm:p-8">
+        <span className="dow-eyebrow dow-eyebrow-dot">CONSOLE LOGIN · 控制台</span>
+        <h2 className="mt-2 font-display text-[26px] font-semibold tracking-tight text-white">
+          控制台<span className="dow-gradient-text">登录</span>
+        </h2>
+
+        <div className="mt-6 space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-white">员工邮箱</label>
+            <input
+              className="dow-dark-input dow-focus"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="请输入员工邮箱"
+              inputMode="email"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-white">密码</label>
+            <input
+              className="dow-dark-input dow-focus"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="请输入密码"
+            />
+          </div>
+          <Button variant="gradient" size="md" onClick={onLogin} className="!w-full">
+            登录
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }

@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Check,
+  LayoutDashboard,
   type LucideIcon,
   Store,
   Users,
@@ -77,11 +78,13 @@ const TRUST_POINTS = [
 interface GatewayPageProps {
   onSelectProvider: () => void;
   onSelectSeller: () => void;
+  onConsole: () => void;
 }
 
 export function GatewayPage({
   onSelectProvider,
   onSelectSeller,
+  onConsole,
 }: GatewayPageProps) {
   function handleEntry(entry: GatewayEntry) {
     if (entry.id === "provider") onSelectProvider();
@@ -149,8 +152,100 @@ export function GatewayPage({
             />
           ))}
         </section>
+
+        {/* 底部战略合作伙伴 banner 广告位 */}
+        <VipPartnerBanner />
+
+        {/* 控制台入口：banner 下方居中（低调，不抢眼） */}
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={onConsole}
+            className="inline-flex items-center gap-2 rounded-full border border-[rgba(139,92,246,0.45)] bg-[rgba(139,92,246,0.14)] px-5 py-2.5 text-sm font-medium text-[#c4b5fd] transition-all hover:bg-[rgba(139,92,246,0.24)] hover:text-white"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            控制台
+          </button>
+        </div>
       </div>
     </main>
+  );
+}
+
+/** VIP 合作伙伴。logo 放 public/ 下对应文件即自动显示；未放置则降级为文字 logo。 */
+const VIP_PARTNERS = [
+  {
+    name: "西邮物流",
+    en: "WPG Logistics",
+    logo: "/logo-xiyou.png",
+    site: "https://www.wpglb.com/",
+  },
+  {
+    name: "泛远国际",
+    en: "Far International",
+    logo: "/logo-far800.png",
+    site: "https://www.far800.com/",
+  },
+];
+
+function VipPartnerBanner() {
+  return (
+    <section className="relative mx-auto mt-16 max-w-5xl">
+      <div className="mb-4 text-center">
+        <span className="dow-eyebrow dow-eyebrow-dot">战略合作伙伴 · STRATEGIC PARTNERS</span>
+      </div>
+      <div className="dow-glass-card relative overflow-hidden p-6 sm:p-8">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-60 blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(236,72,153,0.18), transparent)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 -bottom-24 h-64 w-64 rounded-full opacity-60 blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(99,102,241,0.18), transparent)" }}
+        />
+        <div className="relative grid gap-4 sm:grid-cols-2">
+          {VIP_PARTNERS.map((p) => (
+            <a
+              key={p.name}
+              href={p.site}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-4 rounded-xl border border-[color:var(--border-2)] bg-[color:var(--bg-3)] p-5 transition-all hover:-translate-y-0.5 hover:border-[color:var(--violet)]"
+            >
+              {/* logo 白底盘：真 logo 加载成功则铺满盖住文字 logo；失败则露出文字 logo */}
+              <div className="relative grid h-16 w-40 shrink-0 place-items-center overflow-hidden rounded-lg bg-white px-3">
+                <span className="text-center font-display text-[19px] font-bold leading-tight tracking-tight text-slate-800">
+                  {p.name}
+                </span>
+                <img
+                  src={p.logo}
+                  alt={`${p.name} logo`}
+                  className="absolute inset-0 h-full w-full object-contain p-2"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">{p.name}</span>
+                </div>
+                <p className="mt-1 truncate text-xs text-[color:var(--fg-mute)]">{p.en}</p>
+                <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[color:var(--violet)]">
+                  访问官网
+                  <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+        <p className="relative mt-4 text-center text-[11px] text-[color:var(--fg-faint)]">
+          豆沙包高级认证 · 战略合作服务商
+        </p>
+      </div>
+    </section>
   );
 }
 
@@ -210,17 +305,6 @@ function GatewayCard({
           </li>
         ))}
       </ul>
-
-      <p className="mb-5 border-t border-[color:var(--border)] pt-4 text-[12.5px] leading-relaxed text-[color:var(--fg-faint)]">
-        {entry.path.map((step, index) => (
-          <span key={`${entry.id}-${step}`}>
-            <b className="font-medium text-[color:var(--fg-mute)]">{step}</b>
-            {index < entry.path.length - 1 ? (
-              <span className="mx-1.5 text-[color:var(--violet)]">→</span>
-            ) : null}
-          </span>
-        ))}
-      </p>
 
       <button
         type="button"
