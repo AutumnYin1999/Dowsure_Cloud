@@ -1319,20 +1319,25 @@
 .seller-chat .provider-card.clickable:hover {
   border-color: var(--violet);
 }
-.seller-chat .provider-card .pc-cta {
+.seller-chat .provider-card .pc-detail {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 1px;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 6px 13px;
+  border-radius: 9px;
   font-size: 13px;
   font-weight: 600;
   color: var(--violet);
-  opacity: 0.85;
-  transition: opacity 0.16s ease, transform 0.16s ease;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  cursor: pointer;
+  transition: background 0.16s ease, transform 0.16s ease;
 }
-.seller-chat .provider-card.clickable:hover .pc-cta {
-  opacity: 1;
-  transform: translateX(2px);
+.seller-chat .provider-card .pc-detail:hover {
+  background: rgba(139, 92, 246, 0.18);
+  transform: translateY(-1px);
 }
 .seller-chat .provider-card.is-certified {
   border-color: rgba(139, 92, 246, 0.55);
@@ -1376,6 +1381,18 @@
   color: #fff;
   background: var(--grad);
   box-shadow: 0 6px 16px -8px rgba(139, 92, 246, 0.8);
+}
+/* 普通合作：淡紫描边，区别于灰色智能推荐 */
+.seller-chat .provider-card .pc-badge.partner {
+  border-color: rgba(139, 92, 246, 0.45);
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.12);
+}
+/* 智能推荐：灰色弱化标签 */
+.seller-chat .provider-card .pc-badge.recommend {
+  border-color: var(--border-2);
+  color: var(--fg-faint);
+  background: var(--bg-2);
 }
 .seller-chat .provider-card .pc-strength {
   margin: 0;

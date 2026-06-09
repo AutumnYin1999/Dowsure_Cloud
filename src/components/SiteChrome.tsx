@@ -11,8 +11,6 @@ interface SiteHeaderProps {
   onSellerEntry?: () => void;
   /** 顶部「面向服务商」导航点击 → 服务商问卷。 */
   onProviderEntry?: () => void;
-  /** 顶部「登录 / 服务查询」点击 → 服务进度页。 */
-  onServiceQuery?: () => void;
 }
 
 export function SiteHeader({
@@ -20,7 +18,6 @@ export function SiteHeader({
   onEnterConsole,
   onSellerEntry,
   onProviderEntry,
-  onServiceQuery,
 }: SiteHeaderProps) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -111,21 +108,13 @@ export function SiteHeader({
               <Home className="h-3.5 w-3.5" />
               返回首页
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onServiceQuery}
-              className="text-sm text-[color:var(--fg-mute)] transition-colors hover:text-white"
-            >
-              登录 / 服务查询
-            </button>
-          )}
+          ) : null}
           <button
             type="button"
             onClick={onEnterConsole}
             className="dow-cta-primary !px-4 !py-2 text-sm"
           >
-            进入控制台
+            进入服务商中心
             <span aria-hidden>→</span>
           </button>
         </div>

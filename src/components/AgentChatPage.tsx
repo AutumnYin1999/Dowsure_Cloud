@@ -141,6 +141,7 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
   const [thinking, setThinking] = useState(false);
   const idRef = useRef(0);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const lastMsgRef = useRef<HTMLDivElement | null>(null);
   const startedRef = useRef(false);
 
   const nextId = () => ++idRef.current;
@@ -156,7 +157,14 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
     : "直接打字告诉我你的情况，比如「想找靠谱物流」「回款太慢」";
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const last = messages[messages.length - 1];
+    // 新 AI 回复：把它的顶部对齐到可视区顶部，让人从头读、不用往上划；
+    // 思考中 / 用户刚发：滚到底，露出最新输入与「正在思考」。
+    if (!thinking && last?.role === "agent") {
+      lastMsgRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, [messages, thinking, suggested]);
 
   useEffect(() => {
@@ -293,14 +301,18 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
             <span className="pulse" />
             豆服云 AI 诊断 · DeepSeek 驱动（测试版）
           </span>
-          <h1>像聊天一样，我来帮你诊断经营问题</h1>
+          <h1>卖家经营诊断智能体</h1>
           <p>不用填表 —— 说说你最近最头疼的事，我会顺着帮你把问题聊清楚、算明白。</p>
         </div>
 
         <div className="chat-card">
           <div className="chat-scroll">
-            {messages.map((m) => (
-              <div key={m.id} className={"msg " + m.role}>
+            {messages.map((m, i) => (
+              <div
+                key={m.id}
+                ref={i === messages.length - 1 ? lastMsgRef : undefined}
+                className={"msg " + m.role}
+              >
                 <div className="avatar">{m.role === "agent" ? <Bot size={17} /> : "你"}</div>
                 <div className="msg-body">
                   <div className="bubble">{m.text}</div>
@@ -388,7 +400,8 @@ function openProviderProfile(id: string) {
 
 /** 服务商资料卡：推荐时弹出，可点击查看详情；高级认证服务商带徽章高亮。 */
 function ProviderCard({ p }: { p: SellerProvider }) {
-  const certified = p.tier === "certified";
+  const tier = p.tier ?? "recommend";
+  const certified = tier === "certified";
   const open = () => openProviderProfile(p.id);
   return (
     <div
@@ -408,9 +421,14 @@ function ProviderCard({ p }: { p: SellerProvider }) {
           <Store size={15} className="pc-name-ico" />
           {p.name}
         </span>
-        <span className={"pc-badge" + (certified ? " certified" : "")}>
+        <span
+          className={
+            "pc-badge" +
+            (certified ? " certified" : tier === "recommend" ? " recommend" : " partner")
+          }
+        >
           {certified ? <BadgeCheck size={13} /> : null}
-          {PROVIDER_TIER_LABEL[p.tier ?? "partner"]}
+          {PROVIDER_TIER_LABEL[tier]}
         </span>
       </div>
       {p.strengths ? <p className="pc-strength">{p.strengths}</p> : null}
@@ -439,10 +457,17 @@ function ProviderCard({ p }: { p: SellerProvider }) {
           ))}
         </div>
       ) : null}
-      <span className="pc-cta">
-        查看服务商主页
+      <button
+        type="button"
+        className="pc-detail"
+        onClick={(e) => {
+          e.stopPropagation();
+          open();
+        }}
+      >
+        查看详情
         <ArrowRight size={13} />
-      </span>
+      </button>
     </div>
   );
 }

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豆服云 - 您的权益中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7928CA', // 深紫色主色调
+                        secondary: '#4F46E5', // 靛蓝色
+                        accent: '#06B6D4', // 青色强调色
+                        neon: '#A855F7', // 霓虹紫
+                        light: '#C4B5FD',
+                        'bg-dark': '#0F172A', // 深蓝灰背景
+                        'bg-card': 'rgba(30, 41, 59, 0.7)', // 玻璃拟态卡片背景
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px 0 rgba(121, 40, 202, 0.1)',
+                        'card-hover': '0 8px 30px 0 rgba(121, 40, 202, 0.2)',
+                        'glow': '0 0 20px rgba(121, 40, 202, 0.4)',
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-gradient {
+                background: linear-gradient(90deg, #7928CA 0%, #06B6D4 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #7928CA 0%, #4F46E5 100%);
+            }
+            .bg-gradient-card {
+                background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            }
+            .bg-gradient-title {
+                background: linear-gradient(135deg, rgba(121, 40, 202, 0.15) 0%, rgba(79, 70, 229, 0.1) 50%, rgba(6, 182, 212, 0.08) 100%);
+            }
+            .progress-bar {
+                background: linear-gradient(90deg, #7928CA 0%, #06B6D4 100%);
+            }
+            .grid-bg {
+                background-image: 
+                    linear-gradient(rgba(121, 40, 202, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(121, 40, 202, 0.03) 1px, transparent 1px);
+                background-size: 20px 20px;
+            }
+            .glass-card {
+                @apply bg-bg-card backdrop-blur-md border border-slate-700/50 rounded-xl shadow-card transition-all duration-300 hover:shadow-card-hover;
+            }
+            .status-badge {
+                @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+            }
+            .version-card {
+                @apply cursor-pointer transition-all duration-300;
+            }
+            .version-card.active {
+                @apply transform scale-105;
+            }
+            .version-card.active .version-circle {
+                @apply shadow-glow;
+            }
+            /* 轮播样式 */
+            .carousel-container {
+                overflow: hidden;
+                position: relative;
+                width: 100%;
+            }
+            .carousel-track {
+                display: flex;
+                animation: scroll 30s linear infinite;
+                width: calc(300px * 12);
+            }
+            .carousel-item {
+                flex: 0 0 300px;
+                padding: 0 8px;
+            }
+            @keyframes scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-300px * 6)); }
+            }
+            .carousel-container:hover .carousel-track {
+                animation-play-state: paused;
+            }
+            /* 模态框样式 */
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                overflow-y: auto;
+            }
+            .modal-content {
+                background-color: #0F172A;
+                margin: 50px auto;
+                padding: 20px;
+                border-radius: 16px;
+                width: 90%;
+                max-width: 1200px;
+                position: relative;
+                border: 1px solid rgba(121, 40, 202, 0.2);
+            }
+            .close-modal {
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                font-size: 24px;
+                color: #86909C;
+                cursor: pointer;
+                transition: color 0.3s;
+            }
+            .close-modal:hover {
+                color: #A855F7;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-bg-dark grid-bg text-slate-100 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md shadow-sm border-b border-slate-700/50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-gradient">dowsure</span>
+                    <span class="ml-2 text-lg font-medium text-slate-300">| 豆服云权益中心</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="flex items-center mr-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-neon border border-primary/30">
+                            <i class="fa fa-diamond mr-1"></i> 领航版
+                        </span>
+                        <span class="ml-2 text-sm text-slate-400">有效期至 2026.12.31</span>
+                    </div>
+                    <div class="ml-3 relative">
+                        <div class="flex items-center">
+                            <img class="h-8 w-8 rounded-full border-2 border-primary/50" src="https://picsum.photos/id/1005/200/200" alt="用户头像">
+                            <span class="ml-2 text-sm font-medium text-slate-300">某物流服务商</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- 主要内容区 -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 欢迎区域 -->
+        <div class="mb-10 bg-gradient-title rounded-2xl p-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border border-primary/20">
+            <h1 class="text-[clamp(2rem,4vw,3rem)] font-bold text-slate-100">
+                欢迎回来，<span class="text-gradient font-extrabold">某物流服务商</span>
+            </h1>
+            <p class="mt-2 text-slate-400 text-lg">您的领航版权益包已全部交付，以下是您的权益详情与使用进度</p>
+        </div>
+        <!-- 权益包总览 -->
+        <div class="mb-10 glass-card p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-100">领航版权益包总览</h2>
+                    <p class="text-slate-400">生效时间：2025.12.31 - 2026.12.31</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-3">
+                    <button class="px-4 py-2 bg-gradient-primary text-white rounded-lg hover:shadow-glow transition-all">
+                        <i class="fa fa-download mr-2"></i> 下载权益清单
+                    </button>
+                    <button class="px-4 py-2 border border-primary text-neon rounded-lg hover:bg-primary/10 transition-colors">
+                        联系专属顾问
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 rounded-lg bg-slate-800/50">
+                    <p class="text-3xl font-bold text-slate-100">42</p>
+                    <p class="text-sm text-slate-400">权益总数</p>
+                </div>
+                <div class="text-center p-4 rounded-lg bg-slate-800/50">
+                    <p class="text-3xl font-bold text-success">28</p>
+                    <p class="text-sm text-slate-400">已使用权益</p>
+                </div>
+                <div class="text-center p-4 rounded-lg bg-slate-800/50">
+                    <p class="text-3xl font-bold text-neon">12</p>
+                    <p class="text-sm text-slate-400">待使用权益</p>
+                </div>
+                <div class="text-center p-4 rounded-lg bg-slate-800/50">
+                    <p class="text-3xl font-bold text-slate-500">2</p>
+                    <p class="text-sm text-slate-400">已过期权益</p>
+                </div>
+            </div>
+        </div>
+        <!-- 核心权益使用进度 -->
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">核心权益使用进度</h2>
+            <div class="glass-card p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">AI 拓客报告</span>
+                            <span class="text-sm text-slate-400">102/120 份 (85%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 85%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">下月将重置为 120 份</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">平台首页 Banner 位</span>
+                            <span class="text-sm text-slate-400">3/30 天 (10%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 10%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-danger">剩余 3 天到期，点击申请续期</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">提现优惠券</span>
+                            <span class="text-sm text-slate-400">$62万/$100万 (62%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 62%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">有效期至 2026.12.31</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">私享会场次</span>
+                            <span class="text-sm text-slate-400">1/2 场 (50%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 50%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">已参加：Amazon 私享会</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">风控报告生成</span>
+                            <span class="text-sm text-slate-400">42/100 份 (42%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 42%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">不限次数，按需生成</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-slate-200">大卖有约活动</span>
+                            <span class="text-sm text-slate-400">3/6 场 (50%)</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3">
+                            <div class="progress-bar h-3 rounded-full" style="width: 50%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">已报名：深圳站（审核中）</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增：本月热门资源轮播 -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-slate-100">本月热门资源</h2>
+                <a href="#" class="text-neon text-sm font-medium hover:underline" id="view-all-resources">
+                    查看全部 <i class="fa fa-angle-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="carousel-container rounded-xl p-4 glass-card">
+                <div class="carousel-track">
+                    <!-- 第一组6个资源卡片 -->
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-secondary h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">财税合规专题讲座</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary/10 text-secondary">
+                                        专家主讲
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">金税四期下跨境电商税务合规攻略，香港与海外税务架构搭建实战分享。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.12</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-danger h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">大卖有约 · 深圳站</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger/10 text-danger">
+                                        剩 3 席
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">与亿级卖家面对面交流，深度对接合作机会，分享最新行业趋势与运营技巧。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.15</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-primary h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">香港跨境电商加速器</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-neon">
+                                        限定会员
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">银企对接会，香港银行官方团队主持。了解最新金融政策，对接银行资源。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.20</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-warning h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">高才通 A 类申请绿色通道</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning">
+                                        限时 7 折
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">市场价8万元，豆服云专属价3万元。快速获取香港身份，享受全球资源。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-clock-o mr-1"></i> 截止至 2026.06.30</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-success h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">Walmart 招商对接会</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">
+                                        免费参与
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">Walmart官方招商团队亲临现场，解读入驻政策，快速开通店铺绿色通道。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.05</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-accent h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">Amazon 平台私享会</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent">
+                                        T0/T1 专属
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">Amazon官方团队面对面，获取一手政策信息。了解平台最新规则与发展方向。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.27</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二组6个资源卡片（无缝轮播） -->
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-secondary h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">财税合规专题讲座</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary/10 text-secondary">
+                                        专家主讲
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">金税四期下跨境电商税务合规攻略，香港与海外税务架构搭建实战分享。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.12</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-danger h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">大卖有约 · 深圳站</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger/10 text-danger">
+                                        剩 3 席
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">与亿级卖家面对面交流，深度对接合作机会，分享最新行业趋势与运营技巧。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.15</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-primary h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">香港跨境电商加速器</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-neon">
+                                        限定会员
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">银企对接会，香港银行官方团队主持。了解最新金融政策，对接银行资源。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.20</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-warning h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">高才通 A 类申请绿色通道</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning">
+                                        限时 7 折
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">市场价8万元，豆服云专属价3万元。快速获取香港身份，享受全球资源。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-clock-o mr-1"></i> 截止至 2026.06.30</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-success h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">Walmart 招商对接会</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">
+                                        免费参与
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">Walmart官方招商团队亲临现场，解读入驻政策，快速开通店铺绿色通道。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.05</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-accent h-full">
+                            <div class="p-5 h-full flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold text-slate-100">Amazon 平台私享会</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent">
+                                        T0/T1 专属
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-4 flex-grow">Amazon官方团队面对面，获取一手政策信息。了解平台最新规则与发展方向。</p>
+                                <div class="flex justify-between items-center mt-auto">
+                                    <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.27</span>
+                                    <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                        立即报名
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 权益详情矩阵 -->
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">权益详情与交付内容</h2>
+            
+            <!-- 基础必选权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-primary flex items-center justify-center mr-3 shadow-glow">
+                        <i class="fa fa-check text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">一、基础必选权益（已全部交付）</h3>
+                    <span class="ml-3 text-sm text-slate-400">每位服务商即刻开通，构成日常运营的最低保障</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-desktop text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">平台基础固定展示位</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>豆服平台服务商分类页全年固定展示位，包含公司名称、logo、简介和联系方式
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-rocket text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">AI 智能拓客 · 领航版</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>每年1440份高价值卖家分析报告，包含卖家基本信息、经营数据、风险评估
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                            <div class="progress-bar h-1.5 rounded-full" style="width: 85%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">本月剩余：102/120 份</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-credit-card text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">100 万美金提现优惠券</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>注册豆沙包钱包即送，单笔手续费抵扣50%，降低提现成本
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                            <div class="progress-bar h-1.5 rounded-full" style="width: 62%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">剩余额度：$38万</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-calendar-check-o text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">豆分期服务</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>卖家"先用后付"，服务商提前回款、零坏账风险，支持30/60/90天分期
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">累计放款：$5,680,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 获客增长权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-success flex items-center justify-center mr-3">
+                        <i class="fa fa-line-chart text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">二、获客增长权益</h3>
+                    <span class="ml-3 text-sm text-slate-400">把流量变成订单，把订单变成复购</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-picture-o text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">平台首页 Banner 位</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>钱包首页黄金位置展示1个月，触达全部活跃卖家，包含设计制作
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-warning/20 text-warning border border-warning/30">
+                                <i class="fa fa-clock-o mr-1"></i> 使用中
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                            <div class="progress-bar h-1.5 rounded-full" style="width: 10%"></div>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">剩余：3/30 天</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-bullhorn text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">AI 品牌营销赋能</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>全套AI营销工具包 + 全年1v1顾问，多平台品牌推广方案生成
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">已生成：15 个营销方案</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-globe text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">大卖有约 & 游学考察</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>每年6场大卖有约活动 + 1次北美游学团，可独家冠名
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">已参加：2 场活动</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-plug text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">嵌入式金融跳转端口</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>一周上线，将豆沙包金融接口嵌入自有系统，技术全程支持
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已上线
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">累计跳转：12,450 次</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 增值服务权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-accent flex items-center justify-center mr-3">
+                        <i class="fa fa-diamond text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">三、增值服务权益</h3>
+                    <span class="ml-3 text-sm text-slate-400">从平台资源到资本财税，全链路深度赋能</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-shield text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">账期优化风控模型</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>基于豆沙包风控数据输出卖家评分报告，降低坏账风险
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">已生成：42 份报告</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-handshake-o text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">政策同步 + 1v1 商务对接</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>月度政策简报 + 季度解读会 + 专属商务对接人
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">本月对接：5 次</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-building text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">香港跨境电商加速器</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>每季1-2次银行主导品牌曝光活动，部分政府资助零成本
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">已参加：1 次活动</p>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-user-circle-o text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">跨境云个人服务</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>香港保险 / 高端医疗 / 身份规划 / 全球资产配置咨询
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">已预约：1 次咨询</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 金融赋能权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-warning flex items-center justify-center mr-3">
+                        <i class="fa fa-money text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">四、金融赋能权益</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-bank text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">债权融资咨询</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>1v1融资方案评估，匹配银行/金融机构，全程跟进
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-line-chart text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">股权融资咨询</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>按发展阶段匹配投资机构，BP指导与路演建议
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-file-text text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">公司财务诊断报告</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>完整财务健康度诊断报告1份，含解读会议
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已交付
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-calculator text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">财税指导</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>每季度顶级财税专家讲座，香港/海外架构、金税四期
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 领航版专属权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-primary flex items-center justify-center mr-3 shadow-glow">
+                        <i class="fa fa-star text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">五、领航版专属权益</h3>
+                    <span class="ml-3 text-sm text-slate-400">领航版独享，决胜头部服务商竞争</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-card rounded-xl shadow-card p-5 transition-all duration-300 hover:shadow-card-hover border border-primary/20">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-users text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">平台资源对接私享会</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>每半年一场Amazon/Walmart等平台官方团队私享会
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-card rounded-xl shadow-card p-5 transition-all duration-300 hover:shadow-card-hover border border-primary/20">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-bullhorn text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">线下联合营销</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>全年3场高端闭门会（2场半数亿级+1场全亿级卖家）
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-check-circle mr-1"></i> 已开通
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-card rounded-xl shadow-card p-5 transition-all duration-300 hover:shadow-card-hover border border-primary/20">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                                <i class="fa fa-globe text-neon"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">亚马逊年度大会参展</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>全球顶级电商盛会参展机会，对接全球卖家资源
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-primary/20 text-neon border border-primary/30">
+                                <i class="fa fa-calendar-o mr-1"></i> 2026.09
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 免费赠送权益 -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-6 h-6 rounded-lg bg-success flex items-center justify-center mr-3">
+                        <i class="fa fa-gift text-white text-xs"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neon">六、免费赠送权益</h3>
+                    <span class="ml-3 text-sm text-slate-400">限时免费赠送，价值超 10 万元</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-success/20 flex items-center justify-center mr-3 border border-success/30">
+                                <i class="fa fa-handshake-o text-success"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">渠道合作对接</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>对接优质渠道资源，拓展业务合作机会
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-gift mr-1"></i> 免费赠送
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-success/20 flex items-center justify-center mr-3 border border-success/30">
+                                <i class="fa fa-umbrella text-success"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">物流险咨询服务</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>专业保险顾问提供跨境物流全链路保险方案
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-gift mr-1"></i> 免费赠送
+                            </span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-success/20 flex items-center justify-center mr-3 border border-success/30">
+                                <i class="fa fa-university text-success"></i>
+                            </div>
+                            <h4 class="font-medium text-slate-100">香港企业开户服务</h4>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-3">
+                            <strong>交付内容：</strong>联合香港头部银行提供企业账户开设绿色通道
+                        </p>
+                        <div class="flex items-center">
+                            <span class="status-badge bg-success/20 text-success border border-success/30">
+                                <i class="fa fa-gift mr-1"></i> 免费赠送
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速操作区域 -->
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">快速操作</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-download text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">下载权益清单</p>
+                </button>
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-picture-o text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">申请Banner续期</p>
+                </button>
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-calendar text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">活动报名</p>
+                </button>
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-rocket text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">生成拓客报告</p>
+                </button>
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-credit-card text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">豆分期管理</p>
+                </button>
+                <button class="glass-card p-5 text-center hover:translate-y-[-2px]">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3 border border-primary/30">
+                        <i class="fa fa-user-o text-neon text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200">联系顾问</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- 升级路径 -->
+        <div class="mb-10">
+            <div class="bg-gradient-section rounded-2xl p-8 shadow-card border border-primary/20">
+                <h2 class="text-2xl font-bold text-slate-100 mb-10 text-center">升级路径</h2>
+                
+                <div class="flex flex-col md:flex-row items-center justify-between mb-10 relative">
+                    <!-- 连接线 -->
+                    <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-slate-700 via-primary to-slate-700 transform -translate-y-1/2 z-0"></div>
+                    
+                    <!-- 启航版 -->
+                    <div class="version-card w-full md:w-1/3 text-center mb-10 md:mb-0 relative z-10" data-version="starter">
+                        <div class="version-circle w-24 h-24 rounded-full bg-slate-800 shadow-lg flex items-center justify-center mx-auto mb-4 border-4 border-slate-600">
+                            <i class="fa fa-paper-plane text-slate-400 text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-400">启航版</h3>
+                        <p class="text-sm text-slate-500 mt-1">起步团队</p>
+                        <p class="text-lg font-bold text-slate-400 mt-2">¥28,888/年</p>
+                    </div>
+                    
+                    <!-- 跃升版 -->
+                    <div class="version-card w-full md:w-1/3 text-center mb-10 md:mb-0 relative z-10" data-version="growth">
+                        <div class="version-circle w-28 h-28 rounded-full bg-slate-800 shadow-lg flex items-center justify-center mx-auto mb-4 border-4 border-primary/50">
+                            <i class="fa fa-rocket text-neon text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-neon">跃升版</h3>
+                        <p class="text-sm text-slate-400 mt-1">成长服务商</p>
+                        <p class="text-lg font-bold text-neon mt-2">¥200,000/年</p>
+                        <div class="mt-3">
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-neon border border-primary/30">
+                                推荐升级
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- 领航版 -->
+                    <div class="version-card active w-full md:w-1/3 text-center relative z-10" data-version="premium">
+                        <div class="version-circle w-32 h-32 rounded-full bg-gradient-primary shadow-glow flex items-center justify-center mx-auto mb-4 relative">
+                            <i class="fa fa-diamond text-white text-4xl"></i>
+                            <span class="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center shadow-lg">
+                                <i class="fa fa-check text-white text-sm"></i>
+                            </span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-neon">领航版</h3>
+                        <p class="text-sm text-slate-400 mt-1">头部玩家</p>
+                        <p class="text-xl font-bold text-neon mt-2">¥400,000/年</p>
+                        <div class="mt-3">
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-primary text-white shadow-glow">
+                                当前版本
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6">
+                    <h3 id="version-title" class="font-bold text-slate-100 mb-4 text-center text-lg">领航版 · 包含权益</h3>
+                    <div id="version-benefits" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- 领航版权益（默认显示） -->
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">AI 智能拓客领航版</h4>
+                                <p class="text-xs text-slate-400 mt-1">120 份/月大卖分析报告</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">深度营销指导</h4>
+                                <p class="text-xs text-slate-400 mt-1">20 次线下顾问陪跑</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">平台资源对接私享会</h4>
+                                <p class="text-xs text-slate-400 mt-1">Amazon / Walmart 圆桌</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">线下联合营销</h4>
+                                <p class="text-xs text-slate-400 mt-1">全年 3 场高端闭门会</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">T0/T1 大卖直连</h4>
+                                <p class="text-xs text-slate-400 mt-1">亿级至十亿级卖家通道</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">独家冠名权益</h4>
+                                <p class="text-xs text-slate-400 mt-1">北美游学团冠名席位</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">亚马逊年度大会参展</h4>
+                                <p class="text-xs text-slate-400 mt-1">全球顶级电商盛会</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">跃升版全部权益</h4>
+                                <p class="text-xs text-slate-400 mt-1">包含获客+增值+金融全部</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20">
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">免费赠送权益</h4>
+                                <p class="text-xs text-slate-400 mt-1">渠道+物流险+香港开户</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <button id="upgrade-btn" class="px-8 py-3 bg-gradient-primary text-white rounded-lg font-medium hover:shadow-glow transition-all duration-300">
+                            了解更多升级权益
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center py-8 border-t border-slate-700/50">
+            <p class="text-slate-500 text-sm">© 2026 豆服云 dowsure. 保留所有权利。</p>
+            <p class="text-slate-500 text-xs mt-2">如有任何问题，请联系您的专属顾问或拨打服务热线：400-123-4567</p>
+        </footer>
+    </main>
+
+    <!-- 查看全部热门资源模态框 -->
+    <div id="all-resources-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="text-xl font-bold text-slate-100 mb-6">本月全部热门资源</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 全部6个热门资源卡片 -->
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-danger h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">大卖有约 · 深圳站</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger/10 text-danger">
+                                剩 3 席
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">与亿级卖家面对面交流，深度对接合作机会，分享最新行业趋势与运营技巧。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.15</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-primary h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">香港跨境电商加速器</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-neon">
+                                限定会员
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">银企对接会，香港银行官方团队主持。了解最新金融政策，对接银行资源。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.20</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-warning h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">高才通 A 类申请绿色通道</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning">
+                                限时 7 折
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">市场价8万元，豆服云专属价3万元。快速获取香港身份，享受全球资源。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-clock-o mr-1"></i> 截止至 2026.06.30</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-accent h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">Amazon 平台私享会</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent">
+                                T0/T1 专属
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">Amazon官方团队面对面，获取一手政策信息。了解平台最新规则与发展方向。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.06.27</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-success h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">Walmart 招商对接会</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">
+                                免费参与
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">Walmart官方招商团队亲临现场，解读入驻政策，快速开通店铺绿色通道。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.05</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover border-l-4 border-secondary h-full">
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-slate-100">财税合规专题讲座</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary/10 text-secondary">
+                                专家主讲
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 flex-grow">金税四期下跨境电商税务合规攻略，香港与海外税务架构搭建实战分享。</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-slate-500"><i class="fa fa-calendar-o mr-1"></i> 2026.07.12</span>
+                            <button class="px-3 py-1 bg-gradient-primary text-white text-xs rounded-lg hover:shadow-glow transition-all">
+                                立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简单的交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 卡片悬停效果
+            const cards = document.querySelectorAll('.glass-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // 按钮点击效果
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // 添加点击波纹效果
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // 升级路径切换交互
+            const versionCards = document.querySelectorAll('.version-card');
+            const versionTitle = document.getElementById('version-title');
+            const versionBenefits = document.getElementById('version-benefits');
+            
+            // 各版本权益数据
+            const versionData = {
+                starter: {
+                    title: "启航版 · 包含权益",
+                    benefits: [
+                        { title: "平台基础固定展示位", desc: "豆服平台服务商分类页全年固定展示位" },
+                        { title: "AI 智能拓客·启航版", desc: "20 份/月高价值卖家分析报告" },
+                        { title: "100 万美金提现优惠券", desc: "单笔手续费抵扣 50%" },
+                        { title: "豆分期服务", desc: "卖家「先用后付」，提前回款" },
+                        { title: "基础客服支持", desc: "工作日 9:00-18:00 在线客服" },
+                        { title: "月度行业报告", desc: "每月一份跨境电商行业分析报告" }
+                    ]
+                },
+                growth: {
+                    title: "跃升版 · 包含权益",
+                    benefits: [
+                        { title: "AI 智能拓客跃升版", desc: "80 份/月高价值卖家分析报告" },
+                        { title: "平台首页 Banner 位", desc: "每年 3 个月首页黄金展示位" },
+                        { title: "AI 品牌营销赋能", desc: "全套 AI 营销工具包 + 1v1 顾问" },
+                        { title: "大卖有约活动", desc: "每年 6 场大卖有约活动" },
+                        { title: "嵌入式金融跳转端口", desc: "一周上线，技术全程支持" },
+                        { title: "账期优化风控模型", desc: "不限次数卖家风控评分" },
+                        { title: "1v1 平台商务对接", desc: "月度政策简报 + 季度解读会" },
+                        { title: "香港跨境电商加速器", desc: "每季 1-2 次银行主导活动" },
+                        { title: "金融赋能全系列", desc: "债权+股权融资咨询+财税指导" },
+                        { title: "启航版全部权益", desc: "包含基础必选全部内容" }
+                    ]
+                },
+                premium: {
+                    title: "领航版 · 包含权益",
+                    benefits: [
+                        { title: "AI 智能拓客领航版", desc: "120 份/月大卖分析报告" },
+                        { title: "深度营销指导", desc: "20 次线下顾问陪跑" },
+                        { title: "平台资源对接私享会", desc: "Amazon / Walmart 圆桌" },
+                        { title: "线下联合营销", desc: "全年 3 场高端闭门会" },
+                        { title: "T0/T1 大卖直连", desc: "亿级至十亿级卖家通道" },
+                        { title: "独家冠名权益", desc: "北美游学团冠名席位" },
+                        { title: "亚马逊年度大会参展", desc: "全球顶级电商盛会" },
+                        { title: "跃升版全部权益", desc: "包含获客+增值+金融全部" },
+                        { title: "免费赠送权益", desc: "渠道+物流险+香港开户" }
+                    ]
+                }
+            };
+
+            // 版本卡片点击事件
+            versionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // 移除所有激活状态
+                    versionCards.forEach(c => c.classList.remove('active'));
+                    // 添加当前激活状态
+                    this.classList.add('active');
+                    
+                    const version = this.getAttribute('data-version');
+                    const data = versionData[version];
+                    
+                    // 更新标题
+                    versionTitle.textContent = data.title;
+                    
+                    // 更新权益列表
+                    versionBenefits.innerHTML = '';
+                    data.benefits.forEach(benefit => {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-start p-3 rounded-lg bg-primary/10 border border-primary/20';
+                        item.innerHTML = `
+                            <div class="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center mt-0.5 mr-3 flex-shrink-0 shadow-glow">
+                                <i class="fa fa-check text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-slate-100 text-sm">${benefit.title}</h4>
+                                <p class="text-xs text-slate-400 mt-1">${benefit.desc}</p>
+                            </div>
+                        `;
+                        versionBenefits.appendChild(item);
+                    });
+                });
+            });
+
+            // 查看全部热门资源功能
+            const viewAllBtn = document.getElementById('view-all-resources');
+            const modal = document.getElementById('all-resources-modal');
+            const closeBtn = document.querySelector('.close-modal');
+            
+            viewAllBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                modal.style.display = 'block';
+                // 禁止背景滚动
+                document.body.style.overflow = 'hidden';
+            });
+            
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                // 恢复背景滚动
+                document.body.style.overflow = 'auto';
+            });
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* 点击波纹效果 */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        button {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+</body>
+</html>

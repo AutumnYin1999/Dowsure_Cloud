@@ -162,6 +162,9 @@ export function RecommendationPage({
     [profile, plan.items]
   );
 
+  // TermPay 两张解释卡片暂隐藏，让权益工作台直接顶上来；改 true 可恢复。
+  const SHOW_TERMPAY_CARDS = false;
+
   const handleCopy = async () => {
     const text = buildSummaryText(profile, paidSubtotal, KNOWLEDGE_BASE.filter((b) => isBenefitActive(b)), recMap);
     try {
@@ -278,9 +281,13 @@ export function RecommendationPage({
         </div>
       </section>
 
-      {/* TermPay 模块 */}
-      <TermPayValueSection profile={profile} reasons={termPayReasons} />
-      <TermPayFlowCard />
+      {/* TermPay 解释卡片：暂隐藏，让权益工作台直接顶上来（SHOW_TERMPAY_CARDS=true 可恢复） */}
+      {SHOW_TERMPAY_CARDS ? (
+        <>
+          <TermPayValueSection profile={profile} reasons={termPayReasons} />
+          <TermPayFlowCard />
+        </>
+      ) : null}
 
       {/* 权益工作台 */}
       <section className="dow-glass-card overflow-hidden">

@@ -109,6 +109,7 @@ export function ProviderAgentPage({
   const [thinking, setThinking] = useState(false);
   const idRef = useRef(0);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const lastMsgRef = useRef<HTMLDivElement | null>(null);
   const startedRef = useRef(false);
 
   const nextId = () => ++idRef.current;
@@ -124,7 +125,14 @@ export function ProviderAgentPage({
     : "直接打字告诉我你的情况，比如「我们是海外仓」「给大卖 60 天账期」";
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const last = messages[messages.length - 1];
+    // 新 AI 回复：把它的顶部对齐到可视区顶部，让人从头读、不用往上划；
+    // 思考中 / 用户刚发：滚到底，露出最新输入与「正在思考」。
+    if (!thinking && last?.role === "agent") {
+      lastMsgRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, [messages, thinking, suggested]);
 
   useEffect(() => {
@@ -285,8 +293,12 @@ export function ProviderAgentPage({
 
         <div className="chat-card">
           <div className="chat-scroll">
-            {messages.map((m) => (
-              <div key={m.id} className={"msg " + m.role}>
+            {messages.map((m, i) => (
+              <div
+                key={m.id}
+                ref={i === messages.length - 1 ? lastMsgRef : undefined}
+                className={"msg " + m.role}
+              >
                 <div className="avatar">{m.role === "agent" ? <Bot size={17} /> : "你"}</div>
                 <div className="bubble">{m.text}</div>
               </div>

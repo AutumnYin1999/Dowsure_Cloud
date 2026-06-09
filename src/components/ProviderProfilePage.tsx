@@ -4,6 +4,7 @@ import {
   matchProviders,
   PROVIDER_TIER_LABEL,
   PROVIDERS,
+  tierLabelOf,
   type ProviderPain,
   type SellerProvider,
 } from "@/data/providerCatalog";
@@ -136,7 +137,7 @@ function vmFromProvider(p: SellerProvider): ProfileVM {
     ["服务类别", <>{categoryLabel}</>],
     [
       "豆沙包等级",
-      <>{certified ? <span className="ok">{PROVIDER_TIER_LABEL.certified}</span> : PROVIDER_TIER_LABEL.partner}</>,
+      <>{certified ? <span className="ok">{PROVIDER_TIER_LABEL.certified}</span> : tierLabelOf(p.tier)}</>,
     ],
     ["是否支持 TermPay", <><span className="ok">支持对接</span></>],
     ["推荐来源", <>豆服云资料库智能匹配</>],
@@ -158,14 +159,14 @@ function vmFromProvider(p: SellerProvider): ProfileVM {
       id: sp.id,
       logo: logoOf(sp.name),
       name: sp.name,
-      tag: sp.tier === "certified" ? "认证" : "合作",
+      tag: sp.tier === "certified" ? "认证" : sp.tier === "partner" ? "合作" : "推荐",
       desc: sp.strengths,
     }));
 
   return {
     isDemo: false,
     certified,
-    tierLabel: certified ? PROVIDER_TIER_LABEL.certified : PROVIDER_TIER_LABEL.partner,
+    tierLabel: certified ? PROVIDER_TIER_LABEL.certified : tierLabelOf(p.tier),
     logo: logoOf(p.name),
     name: p.name,
     intro: p.blurb || p.strengths,

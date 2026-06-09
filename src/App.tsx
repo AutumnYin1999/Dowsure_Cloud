@@ -1,5 +1,7 @@
+import { LayoutDashboard } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AgentChatPage } from "@/components/AgentChatPage";
+import { ConsolePage } from "@/components/ConsolePage";
 import { ProviderAgentPage } from "@/components/ProviderAgentPage";
 import { AnalyzingPage } from "@/components/AnalyzingPage";
 import { CheckoutPage } from "@/components/CheckoutPage";
@@ -27,6 +29,7 @@ type AppStep =
   | "checkout"
   | "service-status"
   | "entitlements"
+  | "console"
   | FlowStep;
 
 const STEP_PATHS: Record<AppStep, string> = {
@@ -43,6 +46,7 @@ const STEP_PATHS: Record<AppStep, string> = {
   checkout: "/provider/checkout",
   "service-status": "/provider/service",
   entitlements: "/provider/entitlements",
+  console: "/console",
   welcome: "/",
 };
 
@@ -58,6 +62,7 @@ function stepFromPath(pathname: string): AppStep {
   if (pathname.startsWith("/provider/checkout")) return "checkout";
   if (pathname.startsWith("/provider/service")) return "service-status";
   if (pathname.startsWith("/provider/entitlements")) return "entitlements";
+  if (pathname.startsWith("/console")) return "console";
   if (pathname.startsWith("/provider")) return "questionnaire";
   return "gateway";
 }
@@ -112,10 +117,9 @@ export default function App() {
             ? undefined
             : resetHome
         }
-        onEnterConsole={() => navigate("seller-home")}
+        onEnterConsole={() => navigate("service-status")}
         onSellerEntry={() => navigate("seller-agent")}
         onProviderEntry={() => navigate("provider-agent")}
-        onServiceQuery={() => navigate("service-status")}
       />
 
       {step === "gateway" ? (
@@ -160,6 +164,8 @@ export default function App() {
         <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
           <EntitlementsMatrix />
         </main>
+      ) : step === "console" ? (
+        <ConsolePage onHome={resetHome} />
       ) : (
         <main className="container max-w-6xl pb-24 pt-20 sm:pt-24">
           <div className="space-y-4 sm:space-y-5">
@@ -205,6 +211,18 @@ export default function App() {
       )}
 
       <SiteFooter />
+
+      {/* 右下角浮动入口：进入控制台（数据看板）。控制台页本身不显示。 */}
+      {step !== "console" ? (
+        <button
+          type="button"
+          onClick={() => navigate("console")}
+          className="dow-cta-primary fixed bottom-5 right-5 z-40 !px-4 !py-2.5 text-sm shadow-xl"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          进入控制台
+        </button>
+      ) : null}
     </div>
   );
 }

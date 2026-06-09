@@ -21,22 +21,32 @@ export type ProviderPain =
   | "fit"; // 不知道谁适合我的平台、怕换错
 
 /**
- * 服务商等级：
- * - certified：豆沙包高级认证服务商（豆沙包重点推荐、深度合作，推荐时优先 + 打标）。
- * - partner：普通豆沙包合作服务商（默认）。
+ * 服务商等级（3 档）：
+ * - certified：豆沙包高级认证服务商（深度合作、重点推荐，排序优先 + 高亮打标）。
+ * - partner：豆沙包合作服务商（签约合作名单，普通合作打标）。
+ * - recommend：智能推荐（默认）。非签约、由豆服云资料库智能匹配出来的服务商，灰色打标。
  */
-export type ProviderTier = "certified" | "partner";
+export type ProviderTier = "certified" | "partner" | "recommend";
 
 /** 等级 → 展示标签文案（资料卡徽章用）。 */
 export const PROVIDER_TIER_LABEL: Record<ProviderTier, string> = {
   certified: "豆沙包高级认证服务商",
   partner: "豆沙包合作服务商",
+  recommend: "智能推荐",
 };
+
+/** 缺省档：未显式打标的服务商一律按「智能推荐」处理。 */
+export const DEFAULT_TIER: ProviderTier = "recommend";
+
+/** 取服务商展示标签（带缺省）。 */
+export function tierLabelOf(tier?: ProviderTier): string {
+  return PROVIDER_TIER_LABEL[tier ?? DEFAULT_TIER];
+}
 
 export interface SellerProvider {
   id: string;
   name: string;
-  /** 等级；缺省按 partner（普通合作）处理。 */
+  /** 等级；缺省按 recommend（智能推荐）处理。 */
   tier?: ProviderTier;
   /** 对齐 serviceTaxonomy 的大类 key。 */
   categoryKey: string;
@@ -97,6 +107,7 @@ export const PROVIDERS: SellerProvider[] = [
   {
     id: "op-jijia",
     name: "积加 ERP",
+    tier: "partner",
     categoryKey: "operation",
     subs: ["ERP 工具", "精细化运营", "供应链协同", "财务核算"],
     platforms: ["Amazon"],
@@ -298,6 +309,7 @@ export const PROVIDERS: SellerProvider[] = [
   {
     id: "tax-evat",
     name: "欧税通（eVat Master）",
+    tier: "partner",
     categoryKey: "tax",
     subs: ["VAT 注册申报", "商标注册", "IOSS / EORI / EPR"],
     platforms: ["多平台"],
@@ -405,6 +417,7 @@ export const PROVIDERS: SellerProvider[] = [
   {
     id: "mkt-sinoclick",
     name: "飞书逸途（SinoClick）",
+    tier: "partner",
     categoryKey: "marketing",
     subs: ["Facebook/TikTok/Google 官方开户", "广告投放", "达人合作"],
     platforms: ["独立站", "TikTok Shop", "多平台"],
@@ -470,6 +483,222 @@ export const PROVIDERS: SellerProvider[] = [
       "依托欧洲本地会计师/法务团队，处理较复杂的账号二审、KYC 与资金冻结类申诉。",
     source: "https://jpvat.cn/",
   },
+
+  // ═════════════════════ 豆沙包合作服务商（签约名单 · partner） ═════════════════════
+  // 来源：豆服云合作服务商资料（物流 / 广告 / 财税 / 运营）。logo 后续接入，blurb 为公开信息归纳，
+  // 接入真实商务前请二次核对。
+
+  // ── 合作物流服务商 ──
+  {
+    id: "log-lianyu",
+    name: "联宇物流",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["FBA 头程", "海运 / 空运", "海外仓中转", "尾程派送"],
+    platforms: ["Amazon", "多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作头程物流，海空运 + 海外仓中转链路完整",
+    solves: ["stability", "fit"],
+    blurb: "豆沙包合作物流服务商，提供 FBA 头程、海运空运与海外仓中转、尾程派送。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-kaicangle",
+    name: "开仓了",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["海外仓一件代发", "FBA 中转", "仓配一体"],
+    platforms: ["多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作，海外仓 + 一件代发，仓配一体",
+    solves: ["stability", "aftersale"],
+    blurb: "豆沙包合作物流 / 海外仓服务商，提供海外仓一件代发、FBA 中转与仓配一体服务。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-tuopuda",
+    name: "拓普达",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["FBA 头程", "跨境专线", "海外仓"],
+    platforms: ["Amazon", "多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作头程物流，专线时效稳定",
+    solves: ["stability"],
+    blurb: "豆沙包合作物流服务商，主营 FBA 头程与跨境专线、海外仓配送。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-zhunshida",
+    name: "准时达",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["供应链物流", "FBA 头程", "海外仓", "端到端供应链"],
+    platforms: ["Amazon", "多平台"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，供应链物流能力强、端到端覆盖",
+    solves: ["stability", "fit"],
+    blurb: "豆沙包合作物流服务商（准时达国际供应链），提供端到端供应链物流、FBA 头程与海外仓。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-kaiqi",
+    name: "凯琦",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["FBA 头程", "跨境专线", "尾程派送"],
+    platforms: ["Amazon", "多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作头程物流",
+    solves: ["stability"],
+    blurb: "豆沙包合作物流服务商，主营 FBA 头程与跨境专线、尾程派送。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-chidao",
+    name: "赤道",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["FBA 头程", "海运 / 空运", "尾程派送"],
+    platforms: ["Amazon", "多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作头程物流",
+    solves: ["stability"],
+    blurb: "豆沙包合作物流服务商，提供 FBA 头程、海空运与尾程派送。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "log-niuku",
+    name: "纽酷",
+    tier: "partner",
+    categoryKey: "logistics",
+    subs: ["海外仓一件代发", "FBA 头程", "尾程派送"],
+    platforms: ["多平台"],
+    regions: ["美国", "欧洲"],
+    strengths: "豆沙包合作，海外仓 + 头程一体",
+    solves: ["stability", "aftersale"],
+    blurb: "豆沙包合作物流 / 海外仓服务商，提供海外仓一件代发、FBA 头程与尾程派送。（公开信息归纳，接入前请核对。）",
+  },
+
+  // ── 合作广告服务商（官方广告投放渠道） ──
+  {
+    id: "mkt-meta",
+    name: "Meta",
+    tier: "partner",
+    categoryKey: "marketing",
+    subs: ["Facebook 广告", "Instagram 广告", "官方广告投放"],
+    platforms: ["独立站", "多平台"],
+    regions: ["全球"],
+    strengths: "豆沙包合作官方广告渠道，覆盖 Facebook / Instagram",
+    solves: ["fit"],
+    blurb: "豆沙包合作的官方广告投放渠道，覆盖 Facebook、Instagram 等 Meta 系流量，适合品牌与独立站获客。",
+  },
+  {
+    id: "mkt-google",
+    name: "Google",
+    tier: "partner",
+    categoryKey: "marketing",
+    subs: ["Google Ads", "搜索 / 购物广告", "官方广告投放"],
+    platforms: ["独立站", "多平台"],
+    regions: ["全球"],
+    strengths: "豆沙包合作官方广告渠道，搜索 / 购物 / 展示全覆盖",
+    solves: ["fit"],
+    blurb: "豆沙包合作的官方广告投放渠道（Google Ads），覆盖搜索、购物、展示广告，适合精准获量。",
+  },
+  {
+    id: "mkt-amazonads",
+    name: "Amazon Ads",
+    tier: "partner",
+    categoryKey: "marketing",
+    subs: ["站内广告", "SP / SB / SD", "品牌推广"],
+    platforms: ["Amazon"],
+    regions: ["全球"],
+    strengths: "豆沙包合作官方渠道，亚马逊站内广告全类型",
+    solves: ["fit"],
+    blurb: "豆沙包合作的亚马逊官方广告渠道，覆盖商品推广（SP）、品牌推广（SB）、展示型推广（SD）等站内广告。",
+  },
+
+  // ── 合作财税服务商 ──
+  {
+    id: "tax-jiaderunfeng",
+    name: "嘉德润沣",
+    tier: "partner",
+    categoryKey: "tax",
+    subs: ["跨境财税", "VAT 注册申报", "税务筹划"],
+    platforms: ["多平台"],
+    regions: ["欧洲", "全球"],
+    strengths: "豆沙包合作财税，VAT 合规与税务筹划",
+    solves: ["fit", "transparency"],
+    blurb: "豆沙包合作财税服务商，提供跨境财税、VAT 注册申报与税务筹划。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "tax-xiangmai",
+    name: "响迈财税",
+    tier: "partner",
+    categoryKey: "tax",
+    subs: ["跨境财税", "VAT / 合规", "账务处理"],
+    platforms: ["多平台"],
+    regions: ["欧洲", "全球"],
+    strengths: "豆沙包合作财税，VAT 合规与账务处理",
+    solves: ["fit", "transparency"],
+    blurb: "豆沙包合作财税服务商，提供跨境财税、VAT 合规与账务处理服务。（公开信息归纳，接入前请核对。）",
+  },
+
+  // ── 合作运营服务商 ──
+  {
+    id: "op-shazhixing",
+    name: "沙之星",
+    tier: "partner",
+    categoryKey: "operation",
+    subs: ["亚马逊代运营", "店铺托管", "运营陪跑"],
+    platforms: ["Amazon"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，亚马逊代运营 / 店铺托管",
+    solves: ["fit"],
+    blurb: "豆沙包合作运营服务商，提供亚马逊代运营、店铺托管与运营陪跑。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "op-sellersprite",
+    name: "卖家精灵",
+    tier: "partner",
+    categoryKey: "operation",
+    subs: ["选品分析", "关键词工具", "竞品监控", "数据分析"],
+    platforms: ["Amazon"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，亚马逊选品 / 关键词 / 数据分析工具",
+    solves: ["fit"],
+    blurb: "豆沙包合作运营工具，亚马逊选品、关键词反查、竞品监控与数据分析。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "op-ziniao",
+    name: "紫鸟",
+    tier: "partner",
+    categoryKey: "operation",
+    subs: ["多账号防关联", "超级浏览器", "团队权限管理"],
+    platforms: ["多平台"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，多账号防关联运营（紫鸟浏览器）",
+    solves: ["fit"],
+    blurb: "豆沙包合作运营工具，紫鸟超级浏览器，主打多店铺多账号防关联与团队权限管理。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "op-huiyou",
+    name: "洄游",
+    tier: "partner",
+    categoryKey: "operation",
+    subs: ["亚马逊运营", "运营培训", "代运营陪跑"],
+    platforms: ["Amazon"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，亚马逊运营 / 培训陪跑",
+    solves: ["fit"],
+    blurb: "豆沙包合作运营服务商，提供亚马逊运营、运营培训与代运营陪跑。（公开信息归纳，接入前请核对。）",
+  },
+  {
+    id: "op-mailzone",
+    name: "Mailzone",
+    tier: "partner",
+    categoryKey: "operation",
+    subs: ["邮件营销", "EDM", "客户召回"],
+    platforms: ["独立站", "多平台"],
+    regions: ["全球"],
+    strengths: "豆沙包合作，邮件营销 / EDM 客户召回",
+    solves: ["fit"],
+    blurb: "豆沙包合作运营工具，提供邮件营销（EDM）、客户召回与自动化触达。（公开信息归纳，接入前请核对。）",
+  },
 ];
 
 // ───────────────────────────── 匹配引擎 ─────────────────────────────
@@ -511,10 +740,13 @@ export function matchProviders(input: {
   const scored = pool.map((provider): ScoredProvider => {
     const hits: string[] = [];
     let score = 0;
-    // 高级认证服务商（豆沙包重点推荐）优先：给一个稳定加权，让它在同类里冒头。
+    // 等级加权：高级认证最优先，其次签约合作，智能推荐不加权 —— 让合作/认证在同类里冒头。
     if (provider.tier === "certified") {
       score += 3;
       hits.push("certified");
+    } else if (provider.tier === "partner") {
+      score += 1.5;
+      hits.push("partner");
     }
     for (const pain of pains) {
       if (provider.solves.includes(pain)) {

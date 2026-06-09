@@ -1,20 +1,30 @@
 import {
   ArrowLeft,
+  CalendarClock,
+  CalendarPlus,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   CircleDot,
   Clock,
+  CreditCard,
+  Download,
+  Flame,
   Headphones,
   Home,
+  Image as ImageIcon,
   LogOut,
   MessageSquarePlus,
+  QrCode,
   ShieldCheck,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { showToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import "./provider-console.css";
 
 interface ServiceStatusPageProps {
   /** 返回首页。 */
@@ -195,14 +205,232 @@ const STATUS_META: Record<
   },
 };
 
+/* ───────────────────────── 本月热门资源（轮播） ───────────────────────── */
+
+interface HotResource {
+  title: string;
+  badge: string;
+  tone: keyof typeof TONE;
+  desc: string;
+  date: string;
+}
+
+/** 徽标配色 + 卡片左侧色条（用默认 Tailwind 调色板，和站点紫调协调）。 */
+const TONE = {
+  violet: { badge: "bg-violet-500/15 text-violet-300", bar: "#8b5cf6" },
+  rose: { badge: "bg-rose-500/15 text-rose-300", bar: "#f43f5e" },
+  amber: { badge: "bg-amber-500/15 text-amber-300", bar: "#f59e0b" },
+  emerald: { badge: "bg-emerald-500/15 text-emerald-300", bar: "#10b981" },
+  cyan: { badge: "bg-cyan-500/15 text-cyan-300", bar: "#06b6d4" },
+} as const;
+
+const HOT_RESOURCES: HotResource[] = [
+  { title: "财税合规专题讲座", badge: "专家主讲", tone: "violet", desc: "金税四期下跨境电商税务合规攻略，香港与海外税务架构搭建实战分享。", date: "2026.07.12" },
+  { title: "大卖有约 · 深圳站", badge: "剩 3 席", tone: "rose", desc: "与亿级卖家面对面交流，深度对接合作机会，分享最新行业趋势与运营技巧。", date: "2026.06.15" },
+  { title: "香港跨境电商加速器", badge: "限定会员", tone: "violet", desc: "银企对接会，香港银行官方团队主持。了解最新金融政策，对接银行资源。", date: "2026.06.20" },
+  { title: "高才通 A 类申请绿色通道", badge: "限时 7 折", tone: "amber", desc: "市场价 8 万元，豆服云专属价 3 万元。快速获取香港身份，享受全球资源。", date: "截止 2026.06.30" },
+  { title: "Walmart 招商对接会", badge: "免费参与", tone: "emerald", desc: "Walmart 官方招商团队亲临现场，解读入驻政策，快速开通店铺绿色通道。", date: "2026.07.05" },
+  { title: "Amazon 平台私享会", badge: "T0/T1 专属", tone: "cyan", desc: "Amazon 官方团队面对面，获取一手政策信息。了解平台最新规则与发展方向。", date: "2026.06.27" },
+];
+
+/** 单张资源卡。 */
+function HotCard({ res, onSignup }: { res: HotResource; onSignup: (title: string) => void }) {
+  const tone = TONE[res.tone];
+  return (
+    <div
+      className="flex h-full flex-col rounded-xl border-l-4 bg-[color:var(--bg-3)] p-5 transition-shadow hover:shadow-[0_8px_30px_rgba(139,92,246,0.18)]"
+      style={{ borderLeftColor: tone.bar }}
+    >
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <h3 className="font-semibold text-white">{res.title}</h3>
+        <span className={cn("shrink-0 rounded px-2 py-0.5 text-xs font-medium", tone.badge)}>{res.badge}</span>
+      </div>
+      <p className="mb-4 flex-grow text-sm leading-relaxed text-[color:var(--fg-mute)]">{res.desc}</p>
+      <div className="mt-auto flex items-center justify-between">
+        <span className="inline-flex items-center gap-1 text-xs text-[color:var(--fg-faint)]">
+          <Clock className="h-3 w-3" />
+          {res.date}
+        </span>
+        <button
+          type="button"
+          onClick={() => onSignup(res.title)}
+          className="dow-cta-primary !rounded-lg !px-3 !py-1 text-xs"
+        >
+          立即报名
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────── 报名二维码弹窗 ───────────────────────── */
+
+function QrModal({
+  title,
+  desc,
+  eyebrow,
+  footer,
+  onClose,
+}: {
+  title: string;
+  desc: string;
+  eyebrow: string;
+  footer: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="qr-overlay" onClick={onClose}>
+      <div className="qr-card" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="关闭"
+          className="absolute right-3 top-3 text-[color:var(--fg-mute)] transition-colors hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        <span className="dow-eyebrow dow-eyebrow-dot">{eyebrow}</span>
+        <h3 className="mt-2 font-display text-lg font-semibold text-white">{title}</h3>
+        <p className="mt-1 text-sm text-[color:var(--fg-mute)]">{desc}</p>
+        <div className="qr-frame mt-4">
+          <span className="px-5 text-xs text-[color:var(--fg-faint)]">
+            二维码图片请放在 <code>public/signup-qr.png</code>
+          </span>
+          <img
+            src="/signup-qr.png"
+            alt={`${title} 二维码`}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+        <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-[color:var(--fg-faint)]">
+          <QrCode className="h-3.5 w-3.5" />
+          {footer}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────── 提交需求 / 反馈弹窗 ───────────────────────── */
+
+function FeedbackModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string) => void }) {
+  const [text, setText] = useState("");
+  return (
+    <div className="qr-overlay" onClick={onClose}>
+      <div className="qr-card !max-w-[460px] !text-left" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="关闭"
+          className="absolute right-3 top-3 text-[color:var(--fg-mute)] transition-colors hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        <span className="dow-eyebrow dow-eyebrow-dot">FEEDBACK · 需求 / 反馈</span>
+        <h3 className="mt-2 font-display text-lg font-semibold text-white">提交需求 / 反馈</h3>
+        <p className="mt-1 text-sm text-[color:var(--fg-mute)]">
+          说说你的需求或遇到的问题，专属顾问会尽快跟进对接。
+        </p>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={4}
+          placeholder="例如：想申请 Banner 续期 / 咨询豆分期额度 / 报名深圳站大卖有约…"
+          className="mt-4 w-full resize-none rounded-lg border border-[color:var(--border-2)] bg-[color:var(--bg-3)] p-3 text-sm text-[color:var(--fg-dim)] placeholder:text-[color:var(--fg-faint)] focus:border-[color:var(--violet)] focus:outline-none"
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="darkGhost" size="md" onClick={onClose}>
+            取消
+          </Button>
+          <Button variant="gradient" size="md" disabled={!text.trim()} onClick={() => onSubmit(text.trim())}>
+            提交需求
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────────── 主组件 ───────────────────────── */
 
 export function ServiceStatusPage({ onHome }: ServiceStatusPageProps) {
   const [loggedIn, setLoggedIn] = useState(false);
+  // 二维码弹窗：null = 关闭；对象 = 当前弹窗的标题/文案（报名 or 联系顾问共用）。
+  const [qrModal, setQrModal] = useState<{
+    title: string;
+    desc: string;
+    eyebrow: string;
+    footer: string;
+  } | null>(null);
+  // 提交需求 / 反馈弹窗。
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
+  // 报名：扫码 + 备注资源名锁名额。
+  const openSignup = (title: string) =>
+    setQrModal({
+      title,
+      desc: `微信扫码联系专属顾问，备注「${title}」即可锁定名额`,
+      eyebrow: "SIGN UP · 报名预约",
+      footer: "演示用途 · 扫码后由顾问人工跟进报名",
+    });
+  // 联系顾问：扫码加专属顾问。
+  const openContact = () =>
+    setQrModal({
+      title: "联系专属顾问",
+      desc: "微信扫码即可添加你的专属顾问，1 对 1 在线解答与对接。",
+      eyebrow: "CONTACT · 专属顾问",
+      footer: "演示用途 · 扫码后由顾问人工对接",
+    });
 
   if (!loggedIn) {
     return <LoginCard onLogin={() => setLoggedIn(true)} onHome={onHome} />;
   }
+
+  const quickActions: { icon: LucideIcon; label: string; onClick: () => void }[] = [
+    {
+      icon: Download,
+      label: "下载权益清单",
+      onClick: () => {
+        // 下载 public/dowfu-benefits.pdf（源自 豆服云内容细则·对服务商版），下载名用中文。
+        const a = document.createElement("a");
+        a.href = "/dowfu-benefits.pdf";
+        a.download = "豆服云内容细则（对服务商版）.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast("权益清单已开始下载");
+      },
+    },
+    {
+      icon: ImageIcon,
+      label: "申请 Banner 续期",
+      onClick: () =>
+        setQrModal({
+          title: "申请 Banner 续期",
+          desc: "微信扫码联系专属顾问，备注「Banner 续期」即可办理续约。",
+          eyebrow: "RENEW · 权益续期",
+          footer: "演示用途 · 扫码后由顾问人工办理",
+        }),
+    },
+    { icon: CalendarPlus, label: "活动报名", onClick: () => openSignup("活动报名") },
+    {
+      icon: CalendarClock,
+      label: "分析账期情况",
+      onClick: () => {
+        // 跳到服务商诊断 Agent（/provider-agent）做账期 / 现金流分析，沿用 App 的手写路由。
+        window.history.pushState(null, "", "/provider-agent");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      },
+    },
+    {
+      icon: CreditCard,
+      label: "豆分期申请",
+      onClick: () => window.open("https://www.dowsure.com/dowpl/", "_blank", "noopener,noreferrer"),
+    },
+    { icon: Headphones, label: "联系顾问", onClick: openContact },
+  ];
 
   const counts = {
     done: FULFILL_ITEMS.filter((i) => i.status === "done").length,
@@ -249,6 +477,56 @@ export function ServiceStatusPage({ onHome }: ServiceStatusPageProps) {
           <Kpi label="进行中" value={counts.active} tone="active" />
           <Kpi label="待启动" value={counts.pending} tone="pending" />
           <Kpi label="本期方案总额" value="¥30.8万" tone="amount" />
+        </div>
+      </section>
+
+      {/* 本月热门资源 · 无缝轮播 */}
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-violet-400" />
+            <h2 className="text-lg font-semibold text-white">本月热门资源</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => showToast("已为你展开全部热门资源（演示）")}
+            className="inline-flex items-center gap-1 text-sm font-medium text-violet-400 transition-colors hover:text-white"
+          >
+            查看全部
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="hot-carousel">
+          <div className="hot-track">
+            {[...HOT_RESOURCES, ...HOT_RESOURCES].map((res, i) => (
+              <div className="hot-item" key={`${res.title}-${i}`}>
+                <HotCard res={res} onSignup={openSignup} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 快速操作 */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-white">快速操作</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {quickActions.map((qa) => {
+            const Icon = qa.icon;
+            return (
+              <button
+                key={qa.label}
+                type="button"
+                onClick={qa.onClick}
+                className="dow-glass-card flex flex-col items-center gap-3 p-5 text-center transition-transform hover:-translate-y-0.5"
+              >
+                <span className="grid h-12 w-12 place-items-center rounded-lg border border-violet-500/30 bg-violet-500/15">
+                  <Icon className="h-5 w-5 text-violet-300" />
+                </span>
+                <span className="text-sm font-medium text-[color:var(--fg-dim)]">{qa.label}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -304,11 +582,11 @@ export function ServiceStatusPage({ onHome }: ServiceStatusPageProps) {
               有任何问题，随时联系你的专属顾问。
             </p>
             <div className="mt-4 flex flex-col gap-2">
-              <Button variant="gradient" size="md" onClick={() => showToast("正在为你接通专属顾问")}>
+              <Button variant="gradient" size="md" onClick={openContact}>
                 <Headphones className="h-4 w-4" />
                 联系我的顾问
               </Button>
-              <Button variant="darkOutline" size="md" onClick={() => showToast("需求已记录，顾问会跟进")}>
+              <Button variant="darkOutline" size="md" onClick={() => setFeedbackOpen(true)}>
                 <MessageSquarePlus className="h-4 w-4" />
                 提交需求 / 反馈
               </Button>
@@ -325,6 +603,25 @@ export function ServiceStatusPage({ onHome }: ServiceStatusPageProps) {
           </Button>
         </aside>
       </div>
+
+      {qrModal ? (
+        <QrModal
+          title={qrModal.title}
+          desc={qrModal.desc}
+          eyebrow={qrModal.eyebrow}
+          footer={qrModal.footer}
+          onClose={() => setQrModal(null)}
+        />
+      ) : null}
+      {feedbackOpen ? (
+        <FeedbackModal
+          onClose={() => setFeedbackOpen(false)}
+          onSubmit={() => {
+            setFeedbackOpen(false);
+            showToast("已记录，后续会有专人与你对接");
+          }}
+        />
+      ) : null}
     </div>
   );
 }
