@@ -2,39 +2,54 @@ import { ArrowRight, Bot, RotateCcw, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import "./seller-desk.css";
 import "./seller-chat.css";
-import { diagnoseEconomics, type SellerEconomics, type SellerFacts } from "@/core/sellerEconomics";
 
 /**
- * /agent —— AI 驱动的卖家诊断对话页（C 方案 · 自然语言诊断版）。
+ * /provider-agent —— AI 驱动的「服务商」增长诊断对话页。
+ *
+ * 取代原服务商问卷流（QuestionnairePage → Analyzing → Diagnosis → Recommendation）：
+ * 现在用聊天的方式收集服务商经营现状，边聊边说明豆服云能帮服务商解决什么，最后给一份
+ * 经营诊断报告 + 建议。结构对标卖家版 /seller-agent，但领域是服务商、产出是定性诊断。
  *
  * 两个阶段：
- *  ① intake：DeepSeek 大脑自主追问，收集 平台/月销/主痛点（/api/seller-agent/diagnose）。
- *  ② termpay：槽位齐了 → 引擎算出有出处的金额 → AI 用「自然语言」给现金流诊断、引用行业报告、
- *     自然引出 TermPay，并给几个选项让用户选了解 TermPay 的哪方面（/api/seller-agent/cashflow）。
+ *  ① intake：AI 大脑自主追问，收集 服务商类型/获客困难/回款账期/经营压力（/api/provider-agent/diagnose）。
+ *  ② report：槽位齐了 → AI 用自然语言给经营诊断 + 建议，并把痛点对应到豆服云的能力，
+ *     再自由问答豆服云怎么帮他（/api/provider-agent/report）。
  *
- * 数字只由引擎算（单一数据源、有出处），AI 只负责把它讲成话——不自己编数字。
+ * 与卖家版不同：服务商诊断是定性建议，没有必须由引擎保证的硬金额；但 AI 仍禁止编造
+ * 权益价格 / 授信承诺（见 provider-agent-plugin.ts 的系统提示）。
  */
 
 type ChatMsg = { id: number; role: "agent" | "user"; text: string };
-type Stage = "intake" | "termpay";
+type Stage = "intake" | "report";
+
+/** 服务商经营现状的对话槽位（AI 增量填充，前端只透传）。 */
+type ProviderFacts = {
+  providerType?: string; // 服务商类型 / 主营环节
+  acquisition?: string; // 获客方式 + 最大困难
+  receivables?: string; // 结算方式 / 账期 / 坏账 / 回款周期
+  pressure?: string; // 最大经营压力 + 资金紧张度
+  scale?: string; // 规模 / 客户数（选填）
+  openConcern?: string; // 一句话最头疼（选填）
+  [k: string]: string | undefined;
+};
 
 interface BrainResponse {
   phase: "intake" | "ready_to_diagnose";
   reply: string;
-  facts: SellerFacts;
+  facts: ProviderFacts;
   missing: string[];
   suggestedReplies: string[];
 }
-interface CashflowResponse {
+interface ReportResponse {
   reply: string;
   suggestedReplies: string[];
 }
 
 async function callBrain(
   messages: { role: "agent" | "user"; content: string }[],
-  facts: SellerFacts
+  facts: ProviderFacts
 ): Promise<BrainResponse> {
-  const res = await fetch("/api/seller-agent/diagnose", {
+  const res = await fetch("/api/provider-agent/diagnose", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messages, facts }),
@@ -43,25 +58,23 @@ async function callBrain(
   return (await res.json()) as BrainResponse;
 }
 
-async function callCashflow(body: {
-  facts: SellerFacts;
-  numbers: SellerEconomics;
+async function callReport(body: {
+  facts: ProviderFacts;
   task: "diagnosis" | "followup";
   messages?: { role: "agent" | "user"; content: string }[];
-}): Promise<CashflowResponse> {
-  const res = await fetch("/api/seller-agent/cashflow", {
+}): Promise<ReportResponse> {
+  const res = await fetch("/api/provider-agent/report", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`cashflow ${res.status}`);
-  return (await res.json()) as CashflowResponse;
+  if (!res.ok) throw new Error(`report ${res.status}`);
+  return (await res.json()) as ReportResponse;
 }
 
-export function AgentChatPage({ onHome }: { onHome?: () => void }) {
+export function ProviderAgentPage({ onHome }: { onHome?: () => void }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [facts, setFacts] = useState<SellerFacts>({});
-  const [numbers, setNumbers] = useState<SellerEconomics | null>(null);
+  const [facts, setFacts] = useState<ProviderFacts>({});
   const [stage, setStage] = useState<Stage>("intake");
   const [suggested, setSuggested] = useState<string[]>([]);
   const [input, setInput] = useState("");
@@ -76,9 +89,9 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
     ? "AI 正在思考…"
     : suggested.length
     ? `直接打字，或参考上面，比如「${suggested.slice(0, 2).join("」「")}」`
-    : stage === "termpay"
-    ? "想了解 TermPay 的什么？直接问我"
-    : "直接打字告诉我你的情况，比如「旺季老断货」「回款太慢」";
+    : stage === "report"
+    ? "想了解豆服云怎么帮你？直接问我"
+    : "直接打字告诉我你的情况，比如「获客太难」「客户压价、账期还长」";
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -98,12 +111,12 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
     return list.map((m) => ({ role: m.role, content: m.text }));
   }
 
-  // 阶段①：意图收集（AI 大脑）。槽位齐了 → 过渡到现金流诊断。
+  // 阶段①：意图收集（AI 大脑）。槽位齐了 → 过渡到经营诊断报告。
   // baseFacts 显式传入：restart 时 setFacts({}) 还没生效，闭包里的 facts 仍是旧值，
   // 必须把要用的 facts 当参数传进来，否则“重新开始”会把上一轮的 facts 发给 AI（上下文没清）。
   async function runIntake(
     history: { role: "agent" | "user"; content: string }[],
-    baseFacts: SellerFacts = facts
+    baseFacts: ProviderFacts = facts
   ) {
     setThinking(true);
     setSuggested([]);
@@ -114,10 +127,8 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
       pushAgent(data.reply);
 
       if (data.phase === "ready_to_diagnose") {
-        const econ = diagnoseEconomics(merged);
-        setNumbers(econ);
-        setStage("termpay");
-        const diag = await callCashflow({ facts: merged, numbers: econ, task: "diagnosis" });
+        setStage("report");
+        const diag = await callReport({ facts: merged, task: "diagnosis" });
         pushAgent(diag.reply);
         setSuggested(diag.suggestedReplies ?? []);
       } else {
@@ -130,13 +141,12 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
     }
   }
 
-  // 阶段②：TermPay 自由问答。
-  async function runTermpay(history: { role: "agent" | "user"; content: string }[]) {
-    if (!numbers) return;
+  // 阶段②：诊断报告后的自由问答（豆服云怎么帮你）。
+  async function runReport(history: { role: "agent" | "user"; content: string }[]) {
     setThinking(true);
     setSuggested([]);
     try {
-      const data = await callCashflow({ facts, numbers, task: "followup", messages: history });
+      const data = await callReport({ facts, task: "followup", messages: history });
       pushAgent(data.reply);
       setSuggested(data.suggestedReplies ?? []);
     } catch {
@@ -154,14 +164,13 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
     const history = [...apiHistory(messages), { role: "user" as const, content: trimmed }];
     setMessages((prev) => [...prev, userMsg]);
     if (stage === "intake") void runIntake(history);
-    else void runTermpay(history);
+    else void runReport(history);
   }
 
   function restart() {
     idRef.current = 0;
     setMessages([]);
     setFacts({});
-    setNumbers(null);
     setStage("intake");
     setSuggested([]);
     setInput("");
@@ -175,10 +184,10 @@ export function AgentChatPage({ onHome }: { onHome?: () => void }) {
         <div className="desk-head" style={{ paddingBottom: 18 }}>
           <span className="pill">
             <span className="pulse" />
-            豆服云 AI 诊断 · DeepSeek 驱动（测试版）
+            豆服云 · 服务商增长诊断 · DeepSeek 驱动（测试版）
           </span>
-          <h1>像聊天一样，我来帮你诊断经营问题</h1>
-          <p>不用填表 —— 说说你最近最头疼的事，我会顺着帮你把问题聊清楚、算明白。</p>
+          <h1>像聊天一样，帮你把获客和经营问题聊清楚</h1>
+          <p>不用填问卷 —— 说说你最近最头疼的事，我顺着帮你把经营现状理清楚，给你一份诊断和建议。</p>
         </div>
 
         <div className="chat-card">

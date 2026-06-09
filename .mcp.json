@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "dsb_data": {
+      "type": "http",
+      "url": "https://datahouse.dowsure.com/mcp"
+    }
+  }
+}

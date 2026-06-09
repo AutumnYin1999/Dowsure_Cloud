@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AgentChatPage } from "@/components/AgentChatPage";
+import { ProviderAgentPage } from "@/components/ProviderAgentPage";
 import { AnalyzingPage } from "@/components/AnalyzingPage";
 import { CheckoutPage } from "@/components/CheckoutPage";
 import { DiagnosisPage } from "@/components/DiagnosisPage";
@@ -18,7 +19,8 @@ import type { ProviderProfile } from "@/types";
 type AppStep =
   | "gateway"
   | "seller-home"
-  | "agent"
+  | "seller-agent"
+  | "provider-agent"
   | "chat"
   | "provider-profile"
   | "checkout"
@@ -28,7 +30,8 @@ type AppStep =
 const STEP_PATHS: Record<AppStep, string> = {
   gateway: "/",
   "seller-home": "/seller",
-  agent: "/agent",
+  "seller-agent": "/seller-agent",
+  "provider-agent": "/provider-agent",
   chat: "/chat",
   "provider-profile": "/seller/provider",
   questionnaire: "/provider/intake",
@@ -41,7 +44,8 @@ const STEP_PATHS: Record<AppStep, string> = {
 };
 
 function stepFromPath(pathname: string): AppStep {
-  if (pathname.startsWith("/agent")) return "agent";
+  if (pathname.startsWith("/seller-agent")) return "seller-agent";
+  if (pathname.startsWith("/provider-agent")) return "provider-agent";
   if (pathname.startsWith("/chat")) return "chat";
   if (pathname.startsWith("/seller/provider")) return "provider-profile";
   if (pathname.startsWith("/seller")) return "seller-home";
@@ -105,20 +109,22 @@ export default function App() {
             : resetHome
         }
         onEnterConsole={() => navigate("seller-home")}
-        onSellerEntry={() => navigate("seller-home")}
-        onProviderEntry={() => navigate("questionnaire")}
+        onSellerEntry={() => navigate("seller-agent")}
+        onProviderEntry={() => navigate("provider-agent")}
         onServiceQuery={() => navigate("service-status")}
       />
 
       {step === "gateway" ? (
         <GatewayPage
-          onSelectProvider={() => navigate("questionnaire")}
-          onSelectSeller={() => navigate("seller-home")}
+          onSelectProvider={() => navigate("provider-agent")}
+          onSelectSeller={() => navigate("seller-agent")}
         />
       ) : step === "seller-home" ? (
         <SellerChatPage lockedLine="seller" onHome={resetHome} />
-      ) : step === "agent" ? (
+      ) : step === "seller-agent" ? (
         <AgentChatPage onHome={resetHome} />
+      ) : step === "provider-agent" ? (
+        <ProviderAgentPage onHome={resetHome} />
       ) : step === "chat" ? (
         <SellerChatPage onHome={resetHome} />
       ) : step === "provider-profile" ? (

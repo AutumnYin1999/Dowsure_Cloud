@@ -37,6 +37,8 @@ function repFromWan(wan: number): number {
 /**
  * 从 AI 抽取的自由文本（如「月销80万」「80-100万」「2百万」）解析出代表月 GMV。
  * 解析不出时回退到 30 万（与现有 GMV_REP 默认一致）。
+ * 注意：本函数会把数值「归档到区间中点」（repFromWan），适合卖家只给了区间时用。
+ * 若卖家给了具体月销，请改用 gmvExactFromText —— 直接用真实值算，不再取中点。
  */
 export function gmvRepFromText(text?: string): number {
   if (!text) return 300_000;
@@ -51,11 +53,49 @@ export function gmvRepFromText(text?: string): number {
   return repFromWan(wan);
 }
 
+/**
+ * 解析卖家给出的「具体月销额」为元（CNY），不归档到区间中点 —— 算得更贴近真实。
+ * 支持「35万」「2百万」「1.2千万」「3亿」「800000」等写法。解析不出时回退到区间逻辑。
+ */
+export function gmvExactFromText(text?: string): number {
+  if (!text) return 300_000;
+  const m = text.match(/(\d+(?:\.\d+)?)/);
+  if (!m) return gmvRepFromText(text);
+  let val = parseFloat(m[1]);
+  if (/亿/.test(text)) val *= 100_000_000;
+  else if (/千万/.test(text)) val *= 10_000_000;
+  else if (/百万/.test(text)) val *= 1_000_000;
+  else if (/万/.test(text)) val *= 10_000;
+  // 不带单位的大数按「元」原样处理（如 800000）；小数（如 35）当作「万」更合理。
+  else if (val < 10_000) val *= 10_000;
+  return Math.round(val);
+}
+
+/**
+ * 解析卖家给出的「回款/账期天数」。支持「90天」「3个月」「两个半月」≈数字+单位。
+ * 解析不出时回退到默认账期。
+ */
+export function termDaysFromText(text?: string): number {
+  if (!text) return DEFAULT_TERM_DAYS;
+  const m = text.match(/(\d+(?:\.\d+)?)/);
+  if (!m) return DEFAULT_TERM_DAYS;
+  const num = parseFloat(m[1]);
+  // 「月」优先于「天」：先判月，避免「3个月」里没有数字单位混淆。
+  if (/月/.test(text)) return Math.round(num * 30);
+  if (/周/.test(text)) return Math.round(num * 7);
+  return Math.round(num);
+}
+
 export interface SellerFacts {
   painPrimary?: string;
   painDetail?: string;
   platform?: string;
+  /** 月销区间（粗），如「20-50万」。卖家只给区间时用。 */
   gmvBand?: string;
+  /** 具体月销额（细），如「35万」。给了就优先用它算 rep，不取区间中点。 */
+  gmvExact?: string;
+  /** 回款/账期天数，如「90天」「3个月」。驱动账压与可释放现金。 */
+  termDays?: string;
   serviceCategory?: string;
 }
 
@@ -81,13 +121,18 @@ const roundTo = (n: number, unit: number) => Math.round(n / unit) * unit;
 /** 唯一算钱入口：把 AI 收集到的事实换成各项金额（全部可追溯到 COEF）。 */
 export function diagnoseEconomics(
   facts: SellerFacts,
-  days: number = DEFAULT_TERM_DAYS
+  // 账期天数：优先用卖家给的真实账期（facts.termDays），没有才回退默认 90 天。
+  days: number = termDaysFromText(facts.termDays)
 ): SellerEconomics {
-  const rep = gmvRepFromText(facts.gmvBand);
+  // 给了具体月销就用真实值算（不取区间中点），算得更贴近卖家实际。
+  const rep = facts.gmvExact ? gmvExactFromText(facts.gmvExact) : gmvRepFromText(facts.gmvBand);
   const monthlyBill = roundTo(rep * COEF.logisticsCostRate, 1_000);
+  // 账压随真实账期缩放：11.85% 是 @90天基准的占压率，账期越长压得越多。
+  // 🔴 暂定：线性缩放、基准 90 天，待 LD（06-10）确认占压率与账期的真实关系。
+  const cashLockRaw = rep * COEF.cashLockRate * (days / DEFAULT_TERM_DAYS);
   return {
     rep,
-    cashLock: roundTo(rep * COEF.cashLockRate, 1_000),
+    cashLock: roundTo(cashLockRaw, 1_000),
     costOptim: roundTo(rep * COEF.logisticsCostRate * COEF.compressibleRatio, 1_000),
     stockout: roundTo(rep * COEF.stockoutRate, 10_000),
     monthlyBill,

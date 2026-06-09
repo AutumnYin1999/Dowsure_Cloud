@@ -2,9 +2,10 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { providerAgentPlugin } from "./provider-agent-plugin";
 
 export default defineConfig({
-  plugins: [react(), deepseekAgentPlugin()],
+  plugins: [react(), deepseekAgentPlugin(), providerAgentPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -276,9 +277,11 @@ const DIAGNOSE_SYSTEM_PROMPT = `你是「豆服云」的资深跨境电商经营
 - onboarding（全球开店）：拓新平台/新站点、开户注册不会弄
 - tools（运营工具）：多店铺管理乱、刊登/选品/数据靠人肉
 
-# 诊断需要的必填槽位（凑齐才能算账）
-platform（主要平台）、gmvBand（月销区间）、painPrimary（主痛点）。
-只在「为了把痛点量化」时才问 platform / gmvBand，并说明为什么要问，不要一上来就索要。
+# 诊断需要的必填槽位（四个全凑齐才能算账，缺一不可）
+platform（主要平台）、painPrimary（主痛点）、gmvExact（具体月销额）、termDays（回款/账期天数）。
+- gmvExact：要「具体数」，不要只停在区间。卖家若先说区间（如「20-50万」），顺势追一句「大概落在哪个数？比如 35 万左右？」拿到具体值。
+- termDays：问「你的钱大概被压多久」——从平台回款 + 给服务商的账期算，得到一个天数（如 60/90 天）。这是「压在账期上的钱」最关键的输入。
+- 只在「为了把痛点量化、把金额算准」时才问这些，并说明为什么要问；一次只问一个，不要一上来就索要、也不要一次抛多个问题。
 
 # 对话规则
 - 开场或信息不足时：用开放式问题让他说出最头疼的事，先共情再追问。
@@ -290,11 +293,11 @@ platform（主要平台）、gmvBand（月销区间）、painPrimary（主痛点
 {
   "phase": "intake" | "ready_to_diagnose",
   "reply": "你这一轮要对卖家说的话（1-3句中文）",
-  "facts": { "painPrimary": "...", "painDetail": "卖家原话里的具体痛点", "platform": "...", "gmvBand": "...", "serviceCategory": "..." },
+  "facts": { "painPrimary": "...", "painDetail": "卖家原话里的具体痛点", "platform": "...", "gmvBand": "卖家给的区间(如有)", "gmvExact": "具体月销(如 35万)", "termDays": "回款/账期(如 90天)", "serviceCategory": "..." },
   "missing": ["还缺哪些必填槽位"],
   "suggestedReplies": ["简短选项1", "简短选项2"]
 }
-当 platform、gmvBand、painPrimary 三个槽位都已知时，phase 置为 "ready_to_diagnose"，reply 用一句话过渡到「我来帮你算一算」。facts 里只填已确认的字段，未知的省略。`;
+只有当 platform、painPrimary、gmvExact、termDays 四个槽位都已知时，才把 phase 置为 "ready_to_diagnose"，reply 用一句话过渡到「信息够了，我来帮你算一算」。只要还缺任何一个（含 gmvExact、termDays），phase 必须保持 "intake"，继续追问，绝不要提前下结论或报金额。facts 里只填已确认的字段，未知的省略。`;
 
 function buildDiagnosticMessages(payload: DiagnoseRequest) {
   const history = Array.isArray(payload?.messages) ? payload.messages : [];
@@ -343,7 +346,7 @@ function scriptedNextStep(payload: DiagnoseRequest) {
       phase: "intake" as const,
       reply: "先帮我对一下焦点——你现在最头疼的，是现金/回款，还是成本、缺货？",
       facts,
-      missing: ["painPrimary", "platform", "gmvBand"],
+      missing: ["painPrimary", "platform", "gmvExact", "termDays"],
       suggestedReplies: ["回款太慢、现金紧", "物流仓储成本高", "旺季怕断货"],
     };
   }
@@ -352,17 +355,26 @@ function scriptedNextStep(payload: DiagnoseRequest) {
       phase: "intake" as const,
       reply: "了解。那你主要在哪个平台卖货？",
       facts,
-      missing: ["platform", "gmvBand"],
+      missing: ["platform", "gmvExact", "termDays"],
       suggestedReplies: ["Amazon", "TikTok Shop", "Amazon + TikTok Shop"],
     };
   }
-  if (!has("gmvBand")) {
+  if (!has("gmvExact")) {
     return {
       phase: "intake" as const,
-      reply: "差不多了，最后一个：你店铺每月销售额大概在什么区间？",
+      reply: "为了把金额算准，能说个大概的具体月销吗？比如 35 万左右——不用很精确。",
       facts,
-      missing: ["gmvBand"],
-      suggestedReplies: ["月销 10-50 万", "月销 50-100 万", "月销 100-300 万"],
+      missing: ["gmvExact", "termDays"],
+      suggestedReplies: ["月销 20 万左右", "月销 50 万左右", "月销 100 万左右"],
+    };
+  }
+  if (!has("termDays")) {
+    return {
+      phase: "intake" as const,
+      reply: "最后一个：你的钱大概被压多久？也就是平台回款加上给服务商的账期，差不多多少天？",
+      facts,
+      missing: ["termDays"],
+      suggestedReplies: ["60 天左右", "90 天左右", "120 天以上"],
     };
   }
   return {
@@ -391,7 +403,7 @@ function safeParseDiagnosis(content: unknown, payload: DiagnoseRequest) {
       phase: "intake" as const,
       reply: "先别急着填表——说说你最近经营上最头疼的是哪件事？",
       facts: payload?.facts ?? {},
-      missing: ["platform", "gmvBand", "painPrimary"],
+      missing: ["painPrimary", "platform", "gmvExact", "termDays"],
       suggestedReplies: ["回款太慢、现金紧", "服务商不靠谱想换", "旺季怕断货"],
     };
   }
@@ -485,15 +497,17 @@ function buildCashflowMessages(payload: CashflowRequest) {
   const f = payload.facts ?? {};
   const n = payload.numbers ?? {};
   const platform = (f.platform as string) || "你的平台";
-  const gmvBand = (f.gmvBand as string) || "你当前的体量";
+  const gmvLabel = (f.gmvExact as string) || (f.gmvBand as string) || "你当前的体量";
+  const termLabel = (f.termDays as string) || `${n.days ?? 90} 天`;
   const task = payload.task === "followup" ? "followup" : "diagnosis";
 
   const system = `你是「豆服云」的经营诊断顾问，正在和一位卖家聊他的现金流。语气自然、口语、像顾问当面聊天——不要分点罗列，不要像表格或卡片那样堆字段。
 
 # 已知事实（数字均由系统按行业系数算好，你只能引用，绝不能自己另外编任何金额）
 - 平台：${platform}
-- 月销区间：${gmvBand}
-- 账期占用现金（账压）：约 ${fmtCNYServer(n.cashLock ?? 0)}（= 月销 × 11.85%；来源：JungleScout《2025 亚马逊卖家报告》+ 卖家实测）
+- 月销：${gmvLabel}
+- 回款/账期：约 ${termLabel}
+- 账期占用现金（账压）：约 ${fmtCNYServer(n.cashLock ?? 0)}（= 月销 × 11.85% × 账期/90天；来源：JungleScout《2025 亚马逊卖家报告》+ 卖家实测）
 - 用 TermPay 延期约 ${n.days ?? 90} 天可释放的现金：约 ${fmtCNYServer(n.termpayRelease ?? 0)}
 - TermPay 预估可用额度：约 ${fmtCNYServer(n.termpayQuota ?? 0)}（= 月销 × 1.5；来源：对标 Payoneer ×1.4 / Wayflyer ×1.5–3 的行业共识）
 
@@ -503,8 +517,13 @@ function buildCashflowMessages(payload: CashflowRequest) {
 # 你的任务
 ${
   task === "diagnosis"
-    ? `给出一段现金流诊断结论（3–5 句，自然口语）：① 用上面的数字把"钱正被账期压住、动不了"的损失讲到卖家心里去（损失/痛感框架）；② 引用来源（如"据 JungleScout 报告…"）增强可信；③ 自然地过渡到 TermPay 怎么帮他把这笔现金释放出来。最后在 suggestedReplies 里给 3–4 个"想了解 TermPay 哪方面"的简短选项（例如额度、费用/账期、放款方式、和借贷的区别）。`
-    : `卖家在追问 TermPay 的某个方面，用上面的产品信息准确、口语地回答（2–4 句）。suggestedReplies 给 2–3 个相关的后续问题。`
+    ? `给出一段现金流诊断（4–6 句，自然口语，像顾问当面算给他听）。重点：先讲清楚"这个数怎么来的"再亮数，别让数字凭空蹦出来——
+① 先说比例的出处与估算逻辑：跨境卖家平均约有 11.85% 的月销会卡在回款时间差里（据 JungleScout《2025 亚马逊卖家报告》+ 卖家实测），账期越长压得越多，所以按"月销 × 11.85% × 你的账期÷90天"来估；
+② 然后代入他的月销和账期，自然地报出账压金额（约 ${fmtCNYServer(n.cashLock ?? 0)}），把"这笔钱此刻正躺在回款里、动不了"的痛感讲到他心里去；
+③ 最后自然过渡到 TermPay 怎么帮他把这笔现金提前释放出来。
+口径要诚实：这是"按行业平均估算"，不是他账上的精确数——可以说"大致测算""估个量级"，不要说成铁定如此。
+最后在 suggestedReplies 里给 3–4 个"想了解 TermPay 哪方面"的简短选项（例如额度、费用/账期、放款方式、和借贷的区别）。`
+    : `卖家在追问 TermPay 的某个方面，用上面的产品信息准确、口语地回答（2–4 句）。若他问"这个比例/数字怎么算的"，就如实讲：月销 × 11.85%（JungleScout 报告 + 卖家实测）× 账期÷90天，并说明这是行业平均估算、非精确账目。suggestedReplies 给 2–3 个相关的后续问题。`
 }
 
 # 只输出 JSON：{"reply":"...","suggestedReplies":["...","..."]}
@@ -528,9 +547,11 @@ ${
 function cashflowFallback(payload: CashflowRequest) {
   const n = payload.numbers ?? {};
   const f = payload.facts ?? {};
-  const gmvBand = (f.gmvBand as string) || "你当前的体量";
+  const gmvLabel = (f.gmvExact as string) || (f.gmvBand as string) || "你当前的体量";
   return {
-    reply: `按你月销 ${gmvBand}，亚马逊卖家平均约有 11.85% 的销售额卡在回款时间差里（据 JungleScout《2025 亚马逊卖家报告》）——也就是说大约 ${fmtCNYServer(
+    reply: `按你月销 ${gmvLabel}、账期约 ${
+      n.days ?? 90
+    } 天，亚马逊卖家平均约有 11.85% 的销售额卡在回款时间差里（据 JungleScout《2025 亚马逊卖家报告》）——也就是说大约 ${fmtCNYServer(
       n.cashLock ?? 0
     )} 此刻正躺在回款里、动不了。偏偏旺季要备货，这笔钱却用不上，常常只能再去借。其实用 TermPay 把物流、仓储这些账单延期约 ${
       n.days ?? 90
